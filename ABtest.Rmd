@@ -1,6 +1,6 @@
 ---
 title: "Prueba de hipótesis"
-output: html_notebook
+output: html_document
 ---
 
 Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos medias (*prueba de hipótesis*) utilizando tres técnicas distintas: 
