@@ -1,0 +1,248 @@
+---
+title: "Prueba de hipótesis"
+output: html_notebook
+---
+
+Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos medias (*prueba de hipótesis*) utilizando tres técnicas distintas: 
+
+- de simulación (*permutaciones*), 
+
+- análisis frecuentista (*t-test* y modelo de regresión lineal) y 
+
+- modelos bayesianos:
+
+Para el análisis utilizaremos el conjunto de datos *iris*.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(datasets)
+data(iris)
+iris %>% group_by(Species) %>% summarise(n = n())
+```
+
+Utilizando como única variable el largo del sépalo (sepal length), ¿es *setosa* distinta a una especie ficticia formada por la mezcla de las especies *versicolor* y *virginica*?
+
+Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *versicolor* y *virginica*. De esta manera nuestras dos muestras tendrán el mismo tamaño. 
+
+```{r}
+setosa <- iris %>% 
+  filter(Species == 'setosa') %>% 
+  mutate(Species = as.character(Species)) %>%
+  rename(SepalLength = Sepal.Length) %>% 
+  select(Species, SepalLength)
+
+otraSp <- iris %>% 
+  filter(Species != 'setosa') %>% 
+  select(Species, Sepal.Length) %>% 
+  sample_n(., 50, replace = TRUE) %>% 
+  mutate(Species = "otraSp") %>% 
+  rename(SepalLength = Sepal.Length)
+
+analysis <- bind_rows(setosa, otraSp)
+```
+
+Promedio y desviación estándar del largo de sépalo de nuestras dos *especies*:
+
+```{r}
+(diference <- analysis %>% 
+  group_by(Species) %>% 
+  summarise(mean = mean(SepalLength),
+            sd = sd(SepalLength)))
+```
+
+
+Gráficos de densidad de nuestras dos especies:
+
+```{r}
+ggplot() +
+  geom_density(data = setosa, aes(x = SepalLength), fill = "red", alpha = 0.5) +
+  geom_density(data = otraSp, aes(x = SepalLength), fill = "blue", alpha = 0.5)
+```
+
+La diferencia entre ambos promedios es de:
+
+```{r}
+(mean_diff <- diff(diference$mean))
+```
+
+
+
+### 1. Método de permutaciones (también llamado de aleatorización o *randomizations*):
+
+Si ambas muestras pertenecieran a una misma especie (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?
+
+Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus medias. En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
+
+```{r}
+species_sample <- function(analysis){
+  other1_indx <- sample(1:nrow(analysis), 50, replace = FALSE)
+  other1_df <- analysis$SepalLength[other1_indx]
+  other2_df <- analysis$SepalLength[-other1_indx]
+  mean(other1_df) - mean(other2_df)
+}
+
+permut_results <- replicate(10e4, species_sample(analysis))
+```
+
+Histograma para mostrar la distribución de las diferencias entre promedios de nuestros 100 000 (re)muestreos:
+La línea roja muestra la diferencia encontrada entre el promedio de *setosa* y nuestra *otra especie*.
+
+```{r}
+tibble(differences = permut_results) %>% ggplot(aes(differences)) + 
+  geom_histogram(bins = 100) + 
+  geom_vline(xintercept = diff(diference$mean), colour = "red")
+```
+
+La distribución de las permutaciones no logró siquiera acercarse a la diferencia medida entre *setosa* y nuestra *otra especie*. Podemos ver esto más claramente con el resumen de la distribución de las permutaciones:
+
+```{r}
+summary(permut_results)
+```
+
+Si tomamos en cuenta que en 100000 permutaciones no logramos alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *setosa* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
+
+En otras palabras podemos tener gran certeza de que ambas muestras provienen de distribuciones distintas.
+
+
+### 2. Enfoque frecuentisa: Método *t-test* asumiendo varianzas distintas en ambas muestras.
+
+```{r}
+t.test(setosa$SepalLength, otraSp$SepalLength)
+```
+
+Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16), también claro en que el rango de los intervalos de confianza no cubren el cero.
+
+
+### 3. Enfoque frecuentisa: modelo de regresión lineal.
+
+En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. 
+Para esto el intercepto del modelo tendrá el valor del promedio de una especie (en este caso *setosa*) y el coeficiente representa la diferencia entre esa *otra especie* y *setosa*.
+
+Esto es fácil de notarlo al hacer cero el coeficiente (no existe diferencia entre ambas especies), quedanonos únicamente en la ecuación la igualdad del valor de *otra especie* como variable respuesta y el intercepto (promedio de *otra especie*).
+
+```{r}
+#convertimos a setosa a valor 1 y a otra especie a valor 0
+analysis_classified <- analysis %>% 
+  mutate(sp_id = case_when(Species == "setosa" ~ as.integer(1),
+                           Species == "otraSp" ~ as.integer(0))) %>% 
+  select(sp_id, SepalLength)
+
+linmod <- lm(SepalLength ~ sp_id, data = analysis_classified)
+summary(linmod)
+```
+
+Podemos ver que el valor del intercepto **(Intercept)** es el mismo valor del promedio de **otra especie** previamente calculado, y el valor del coeficiente (**sp_id**) la diferencia entre **otra especie** y **setosa**. Vemos también en la columna **Pr(>|t|)** que la probabilidad que el valor del coeficiente se produzca al azar en caso de que ambas muestras provinieran de una misma distribución es sumamente bajo.
+
+Nota:
+Vale aclarar que la función **lm** de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para **setosa** y 0 para **otraSP**), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete **Rethinking** en la creación del modelo bayesiano.
+
+
+### 4. Método bayesiano utilizando el paquete **Rethinking** como interface a la herramienta **Stan**.
+
+La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, generando una distribución posterior de los valores de cada variable. 
+
+El modelo se especifíca en el chunk siguiente y se lee como: 
+el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (el intercepto) es el valor promedio de **otra especie** y *b* es el promedio de la diferencia entre **otra especie** y **setosa**. Como previos de **a** y **b** utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
+Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.
+
+```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
+library(rethinking)
+
+diff_mod <- ulam(
+  alist(
+    SepalLength ~ dnorm(mu, sigma),
+    mu <- a + b*sp_id,
+    a ~ dnorm(4, 1),
+    b ~ dnorm(1, 1),
+    sigma ~ dexp(1)
+  ), data = analysis_classified, chains=4)
+```
+
+Con la función **precis** podemos ver el resumen de los valores de cada variable:
+
+```{r}
+precis(diff_mod)
+```
+
+Podemos ver en la columna **mean** que el valor de **b** (diferencia entre promedios) es similar al del modelo lineal frecuentista, pero a diferencia del otro, tenemos una distribución completa de esa variable. El intervalo de credibilidad para esa variable no incluye el cero, por lo que nuestra conclusión es igual a la de los métodos anteriores.
+
+Otra manera en que podemos calcular esta comparación entre promedios es creando distribuciones para los promedios de cada una de las especies.
+
+Para esto convertimos las especies a valores enteros y creamos un modelo donde cada una de las especies tendrá un intercepto distinto. Para **Setosa** le damos un valor igual a 2 y **otra especie** de 1.
+
+Notese que para el paquete Rethinking, los números asignados a esta nueva categorización deben de ser enteros. Si no utilizan la función de **as.integer** para asignarlos, el programa les dará un error.
+
+```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
+an_reth2 <- analysis %>% 
+  mutate(Sp = as.integer(case_when(Species == "setosa" ~ 2,
+                                   Species != "setosa" ~ 1))) %>% 
+  select(Sp, SepalLength)
+
+mod_sp <- ulam(
+  alist(
+    SepalLength ~ dnorm(mu, sigma),
+    mu <- a[Sp],
+    sigma <- b[Sp],
+    a[Sp] ~ dnorm(4, 1),
+    b[Sp] ~ dexp(1)
+  ), data = an_reth2, chains=4)
+```
+
+```{r}
+precis(mod_sp, depth = 2)
+```
+
+```{r}
+plot(precis(mod_sp, depth = 2))
+```
+
+
+```{r}
+samples <- extract.samples(mod_sp, n = 100000)
+```
+
+
+```{r}
+mean_setosa <- mean(samples$a[,1]); sd_setosa <- sd(samples$a[,1])
+mean_other <- mean(samples$a[,2]); sd_other <- sd(samples$a[,2])
+
+ggplot(data.frame(x = c(2.5, 10)), aes(x)) +
+  stat_function(fun = dnorm, colour = "red", args = list(mean = mean_setosa, sd = sd_setosa)) +
+  stat_function(fun = dnorm, colour = "blue", args = list(mean = mean_other, sd = sd_other))
+
+```
+
+
+```{r message=FALSE, warning=TRUE}
+library(brms)
+
+mod_brms <- brm(
+  SepalLength ~ Species,
+  data = analysis
+)
+```
+
+```{r}
+summary(mod_brms)
+```
+
+Now including unequal variances:
+```{r message=FALSE, warning=FALSE}
+mod_brms_frm <- bf(SepalLength ~ Species, sigma ~ Species)
+
+mod_brms_var <- brm(
+  mod_brms_frm, 
+  data = analysis, 
+  cores=2)
+```
+
+
+```{r}
+summary(mod_brms_var)
+```
+
+```{r}
+plot(mod_brms_var)
+```
+
+
