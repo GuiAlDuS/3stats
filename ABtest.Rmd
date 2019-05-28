@@ -130,18 +130,18 @@ linmod <- lm(SepalLength ~ sp_id, data = analysis_classified)
 summary(linmod)
 ```
 
-Podemos ver que el valor de la intersección **(Intercept)** es el mismo valor del promedio de **otra especie** previamente calculado, y el valor del coeficiente (**sp_id**) la diferencia entre **otra especie** y **setosa**. Vemos también en la columna **Pr(>|t|)** que la probabilidad que el valor del coeficiente se produzca al azar en caso de que ambas muestras provinieran de una misma distribución es sumamente bajo.
+Podemos ver que el valor de la intersección *(Intercept)* es el mismo valor del promedio de *otra especie* previamente calculado, y el valor del coeficiente (*sp_id*) la diferencia entre *otra especie* y *setosa*. Vemos también en la columna *Pr(>|t|)* que la probabilidad que el valor del coeficiente se produzca al azar en caso de que ambas muestras provinieran de una misma distribución es sumamente bajo.
 
 Nota:
-Vale aclarar que la función **lm** de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para **setosa** y 0 para **otraSP**), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete **Rethinking** en la creación del modelo bayesiano.
+Vale aclarar que la función *lm* de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para *setosa* y 0 para *otraSP*), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete *Rethinking* en la creación del modelo bayesiano.
 
 
-### 4. Enfoque bayesiano utilizando el paquete **Rethinking** como interface a la herramienta **Stan**.
+### 4. Enfoque bayesiano utilizando el paquete *Rethinking* como interface a la herramienta *Stan*.
 
 La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución posterior de los valores de cada variable. 
 
 El modelo se especifíca en el chunk siguiente y se lee como: 
-el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (la intersección) es el valor promedio de **otra especie** y *b* es el promedio de la diferencia entre **otra especie** y **setosa**. Como previos de **a** y **b** utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
+el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *setosa*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
 Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
@@ -221,7 +221,7 @@ ggplot(samples_df, aes(x = dist, y = valor)) +
 
 Podemos ver cómo las distribuciones están lejos una de la otra.
 
-```{r message=FALSE, warning=TRUE}
+```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 library(brms)
 
 mod_brms <- brm(
@@ -230,12 +230,12 @@ mod_brms <- brm(
 )
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 summary(mod_brms)
 ```
 
 Now including unequal variances:
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 mod_brms_frm <- bf(SepalLength ~ Species, sigma ~ Species)
 
 mod_brms_var <- brm(
