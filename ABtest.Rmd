@@ -200,7 +200,7 @@ Podemos también graficar estas distribuciones utilizando las funciones *plot* y
 plot(precis(mod_sp, depth = 2))
 ```
 
-Otra manera de elaborar esta misma comparación de distribuciones es extrayendo valores del modelo y graficando las variables que nos interesan. Para esto tomamos 100000 muestras del modelo creado utilizando la función *extrac.samples*.
+Otra manera de elaborar esta misma comparación de distribuciones es extrayendo valores del modelo y graficando las variables que nos interesan. Para esto tomamos 100000 muestras del modelo creado utilizando la función *extract.samples*.
 
 ```{r}
 samples <- extract.samples(mod_sp, n = 100000)
@@ -210,6 +210,7 @@ Esta función nos genera una lista con cada una de las variables del modelo y de
 
 Estas muestras representan la distribución de cada una de esas variables, por lo que podemos utilizarlas para graficarlas.
 
+En este caso graficamos las distribuciones marginales para los promedios de especies.
 
 ```{r}
 samples_df <- tibble(a1 = samples$a[,1], a2 = samples$a[,2]) %>% gather(key = "dist", value = "valor")
