@@ -20,25 +20,25 @@ data(iris)
 iris %>% group_by(Species) %>% summarise(n = n())
 ```
 
-Utilizando como única variable el largo del sépalo (sepal length), ¿es *setosa* distinta a una especie ficticia formada por la mezcla de las especies *versicolor* y *virginica*?
+Utilizando como única variable el ancho del sépalo (sepal width), ¿es la distribución de esa variable en  *versicolor* distinta a la de una especie ficticia formada por la mezcla de las especies *virginica* y *setosa*?
 
-Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *versicolor* y *virginica*. De esta manera nuestras dos muestras tendrán el mismo tamaño. 
+Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *virginica* y *setosa*. De esta manera nuestras dos muestras tendrán el mismo tamaño. 
 
 ```{r}
-setosa <- iris %>% 
-  filter(Species == 'setosa') %>% 
+versicolor <- iris %>% 
+  filter(Species == 'versicolor') %>% 
   mutate(Species = as.character(Species)) %>%
-  rename(SepalLength = Sepal.Length) %>% 
-  select(Species, SepalLength)
+  rename(SepalWidth = Sepal.Width) %>% 
+  select(Species, SepalWidth)
 
 otraSp <- iris %>% 
-  filter(Species != 'setosa') %>% 
-  select(Species, Sepal.Length) %>% 
+  filter(Species != 'versicolor') %>% 
+  select(Species, Sepal.Width) %>% 
   sample_n(., 50, replace = TRUE) %>% 
   mutate(Species = "otraSp") %>% 
-  rename(SepalLength = Sepal.Length)
+  rename(SepalWidth = Sepal.Width)
 
-analysis <- bind_rows(setosa, otraSp)
+analysis <- bind_rows(versicolor, otraSp)
 ```
 
 Promedio y desviación estándar del largo de sépalo de nuestras dos *especies*:
@@ -46,8 +46,8 @@ Promedio y desviación estándar del largo de sépalo de nuestras dos *especies*
 ```{r}
 (diference <- analysis %>% 
   group_by(Species) %>% 
-  summarise(mean = mean(SepalLength),
-            sd = sd(SepalLength)))
+  summarise(mean = mean(SepalWidth),
+            sd = sd(SepalWidth)))
 ```
 
 
@@ -55,8 +55,8 @@ Gráficos de densidad de nuestras dos especies:
 
 ```{r}
 ggplot() +
-  geom_density(data = setosa, aes(x = SepalLength), fill = "red", alpha = 0.5) +
-  geom_density(data = otraSp, aes(x = SepalLength), fill = "blue", alpha = 0.5)
+  geom_density(data = versicolor, aes(x = SepalWidth), fill = "red", alpha = 0.5) +
+  geom_density(data = otraSp, aes(x = SepalWidth), fill = "blue", alpha = 0.5)
 ```
 
 La diferencia entre ambos promedios es de:
@@ -76,8 +76,8 @@ Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). C
 ```{r}
 species_sample <- function(analysis){
   other1_indx <- sample(1:nrow(analysis), 50, replace = FALSE)
-  other1_df <- analysis$SepalLength[other1_indx]
-  other2_df <- analysis$SepalLength[-other1_indx]
+  other1_df <- analysis$SepalWidth[other1_indx]
+  other2_df <- analysis$SepalWidth[-other1_indx]
   mean(other1_df) - mean(other2_df)
 }
 
@@ -85,29 +85,36 @@ permut_results <- replicate(10e4, species_sample(analysis))
 ```
 
 Con un histograma se muestra la distribución de las diferencias entre promedios de nuestros 100 000 (re)muestreos:
-La línea roja representa el valor de la diferencia encontrada entre el promedio de *setosa* y nuestra *otra especie*.
+La línea roja representa el valor de la diferencia encontrada entre el promedio de *versicolor* y nuestra *otra especie*.
 
 ```{r}
-tibble(differences = permut_results) %>% ggplot(aes(differences)) + 
-  geom_histogram(bins = 100) + 
+tibble(differences = permut_results) %>% 
+  ggplot(aes(differences)) + 
+  geom_histogram(bins = 50) + 
   geom_vline(xintercept = diff(diference$mean), colour = "red")
 ```
 
-La distribución de las permutaciones no logró siquiera acercarse a la diferencia medida entre *setosa* y nuestra *otra especie*. Podemos ver esto más claramente con el resumen de la distribución de las permutaciones:
+La distribución de las permutaciones apenas logró acercarse a la diferencia medida entre *versicolor* y nuestra *otra especie*. Podemos ver esto más claramente con el resumen de la distribución de las permutaciones:
 
 ```{r}
 summary(permut_results)
 ```
 
-Si tomamos en cuenta que en 100000 permutaciones no logramos alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *setosa* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
+Según el histograma y resumen de la distribución, vemos que algunas de las permutaciones sí lograron superar el valor medido entre los promedios. Esto lo podemos cuantificar facilmente:
 
-En otras palabras podemos tener gran certeza de que ambas muestras provienen de distribuciones distintas.
+```{r}
+length(permut_results[permut_results < diff(diference$mean)])
+```
+
+Si tomamos en cuenta que únicamente 4 permutaciones de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/25000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
+
+En otras palabras, tenemos certeza de que ambas muestras provienen de distribuciones distintas.
 
 
 ### 2. Enfoque frecuentisa: Método *t-test* asumiendo varianzas distintas en ambas muestras.
 
 ```{r}
-t.test(setosa$SepalLength, otraSp$SepalLength)
+t.test(versicolor$SepalWidth, otraSp$SepalLength)
 ```
 
 Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16), también claro en que el rango de los intervalos de confianza no cubren el cero.
@@ -116,24 +123,24 @@ Podemos ver que la probabilidad de que ambos promedios provengan de una misma di
 ### 3. Enfoque frecuentisa: modelo de regresión lineal.
 
 En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. 
-Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *setosa*) y el coeficiente(pendiente) representa la diferencia entre esa *otra especie* y *setosa*.
+Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *versicolor*) y el coeficiente(pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
 
 
 ```{r}
 #convertimos a setosa a valor 1 y a otra especie a valor 0
 analysis_classified <- analysis %>% 
-  mutate(sp_id = case_when(Species == "setosa" ~ as.integer(1),
+  mutate(sp_id = case_when(Species == "versicolor" ~ as.integer(1),
                            Species == "otraSp" ~ as.integer(0))) %>% 
-  select(sp_id, SepalLength)
+  select(sp_id, SepalWidth)
 
-linmod <- lm(SepalLength ~ sp_id, data = analysis_classified)
+linmod <- lm(SepalWidth ~ sp_id, data = analysis_classified)
 summary(linmod)
 ```
 
-Podemos ver que el valor de la intersección *(Intercept)* es el mismo valor del promedio de *otra especie* previamente calculado, y el valor del coeficiente (*sp_id*) la diferencia entre *otra especie* y *setosa*. Vemos también en la columna *Pr(>|t|)* que la probabilidad que el valor del coeficiente se produzca al azar en caso de que ambas muestras provinieran de una misma distribución es sumamente bajo.
+Podemos ver que el valor de la intersección *(Intercept)* es el mismo valor del promedio de *otra especie* previamente calculado, y el valor del coeficiente (*sp_id*) la diferencia entre *otra especie* y *versicolor*. Vemos también en la columna *Pr(>|t|)* que la probabilidad que el valor del coeficiente se produzca al azar en caso de que ambas muestras provinieran de una misma distribución es sumamente bajo.
 
 Nota:
-Vale aclarar que la función *lm* de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para *setosa* y 0 para *otraSP*), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete *Rethinking* en la creación del modelo bayesiano.
+Vale aclarar que la función *lm* de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para *versicolor* y 0 para *otraSP*), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete *Rethinking* en la creación del modelo bayesiano.
 
 
 ### 4. Enfoque bayesiano utilizando el paquete *Rethinking* como interface a la herramienta *Stan*.
@@ -141,7 +148,7 @@ Vale aclarar que la función *lm* de R no necesita que la variable categórica (
 La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución posterior de los valores de cada variable. 
 
 El modelo se especifíca en el chunk siguiente y se lee como: 
-el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *setosa*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
+el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *versicolor*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
 Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
@@ -149,7 +156,7 @@ library(rethinking)
 
 diff_mod <- ulam(
   alist(
-    SepalLength ~ dnorm(mu, sigma),
+    SepalWidth ~ dnorm(mu, sigma),
     mu <- a + b*sp_id,
     a ~ dnorm(4, 1),
     b ~ dnorm(1, 1),
@@ -167,19 +174,19 @@ Podemos ver en la columna *mean* que el valor de *b* (diferencia entre promedios
 
 Otra manera en que podemos calcular esta comparación entre promedios es creando distribuciones para los promedios de cada una de las especies.
 
-Para esto debemos asignar un índice distinto a cero a cada especie y creamos un modelo donde cada una de las especies tendrá una intersección distinta. Para esta índice damos a *Setosa* un valor igual a 2 y *otra especie* de 1.
+Para esto debemos asignar un índice distinto a cero para cada especie y crear un modelo donde cada una de las especies tendrá una intersección distinta. Para esta índice damos a *Versicolor* un valor igual a 2 y *otra especie* de 1.
 
 Notese que para el paquete Rethinking, los números asignados a estos índices deben de ser enteros.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 an_reth2 <- analysis %>% 
-  mutate(Sp = as.integer(case_when(Species == "setosa" ~ 2,
-                                   Species != "setosa" ~ 1))) %>% 
-  select(Sp, SepalLength)
+  mutate(Sp = as.integer(case_when(Species == "versicolor" ~ 2,
+                                   Species != "versicolor" ~ 1))) %>% 
+  select(Sp, SepalWidth)
 
 mod_sp <- ulam(
   alist(
-    SepalLength ~ dnorm(mu, sigma),
+    SepalWidth ~ dnorm(mu, sigma),
     mu <- a[Sp],
     sigma <- b[Sp],
     a[Sp] ~ dnorm(4, 1),
@@ -188,7 +195,7 @@ mod_sp <- ulam(
 ```
 
 Ahora con la función *summary* (o también *precis*) vemos el resumen de los valores de cada variable.
-Se puede notar que las distribuciones de **a1** (distribución del promedio de *otra especie*) y **a2** (distribución del promedio de *Setosa*) no se sobreponen. En el caso de **a1** el 95% de la distribución se encuentra entre 6.09 y 6.46, mientras que para **a2** va de 4.91 a 5.11.
+Se puede notar que las distribuciones de **a1** (distribución del promedio de *otra especie*) y **a2** (distribución del promedio de *Versicolor*) no se sobreponen. En el caso de **a1** el 95% de la distribución se encuentra entre 2.97 y 3.19, mientras que para **a2** va de 2.68 a 2.86.
 
 ```{r}
 summary(mod_sp)
@@ -220,13 +227,14 @@ ggplot(samples_df, aes(x = dist, y = valor)) +
   geom_boxplot(fill = NA, colour = "green")
 ```
 
-Podemos ver cómo las distribuciones están lejos una de la otra.
+Podemos ver cómo la mayoría de los valores de cada una de las especies se encuentran agrupados alrededor de dos valores distintos, por lo que llegamos a la misma conclusión que con los metodos anteriores.
+
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 library(brms)
 
 mod_brms <- brm(
-  SepalLength ~ Species,
+  SepalWidth ~ Species,
   data = analysis
 )
 ```
@@ -237,7 +245,7 @@ summary(mod_brms)
 
 Now including unequal variances:
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
-mod_brms_frm <- bf(SepalLength ~ Species, sigma ~ Species)
+mod_brms_frm <- bf(SepalWidth ~ Species, sigma ~ Species)
 
 mod_brms_var <- brm(
   mod_brms_frm, 
