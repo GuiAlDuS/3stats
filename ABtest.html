@@ -1568,7 +1568,7 @@ iris %&gt;% group_by(Species) %&gt;% summarise(n = n())</code></pre>
 ## 2 versicolor    50
 ## 3 virginica     50</code></pre>
 <p>Utilizando como única variable el ancho del sépalo (sepal width), ¿podemos inferir que los promedios de <em>versicolor</em> y una especie ficticia formada por las especies <em>virginica</em> y <em>setosa</em> provienen de distribuciones distintas?</p>
-<p>Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de <em>virginica</em> y <em>setosa</em>. De esta manera nuestras dos muestras tendrán igual tamaño.</p>
+<p>Creemos esa <em>otra especie</em> seleccionado aleatoriamente 50 filas de la combinación de <em>virginica</em> y <em>setosa</em>. De esta manera nuestras dos muestras tendrán igual tamaño.</p>
 <pre class="r"><code>versicolor &lt;- iris %&gt;% 
   filter(Species == 'versicolor') %&gt;% 
   mutate(Species = as.character(Species)) %&gt;%
@@ -1626,7 +1626,7 @@ permut_results &lt;- replicate(10e4, species_sample(analysis))</code></pre>
 <p>Según el histograma y resumen de la distribución, no hubo ningún caso en que las permutaciones igualaran o sobrepasaran nuestro valor medido.</p>
 <pre class="r"><code>length(permut_results[permut_results &lt; diff(diference$mean)])</code></pre>
 <pre><code>## [1] 0</code></pre>
-<p>Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de <em>versicolor</em> y <em>otra especie</em> se produzca al azar si ambas distribuciones pertenecieran a una sola especie.</p>
+<p>Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de <em>versicolor</em> y <em>otra especie</em> se produzca al azar si ambas distribuciones pertenecieran a una misma especie.</p>
 <p>En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.</p>
 </div>
 <div id="enfoque-frecuentista-metodo-t-test-asumiendo-varianzas-distintas-en-ambas-muestras." class="section level3">
@@ -1647,7 +1647,7 @@ permut_results &lt;- replicate(10e4, species_sample(analysis))</code></pre>
 </div>
 <div id="enfoque-frecuentista-modelo-de-regresion-lineal." class="section level3">
 <h3>3. Enfoque frecuentista: modelo de regresión lineal.</h3>
-<p>En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso <em>versicolor</em>) y el coeficiente(pendiente) representa la diferencia entre esa <em>otra especie</em> y <em>versicolor</em>.</p>
+<p>En este caso modelaremos el valor del ancho del sépalo con respecto a cada una de las especies. Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso <em>versicolor</em>) y el coeficiente (pendiente) representa la diferencia entre esa <em>otra especie</em> y <em>versicolor</em>.</p>
 <pre class="r"><code>#convertimos a setosa a valor 1 y a otra especie a valor 0
 analysis_classified &lt;- analysis %&gt;% 
   mutate(sp_id = case_when(Species == &quot;versicolor&quot; ~ as.integer(1),
@@ -1703,7 +1703,7 @@ diff_mod &lt;- ulam(
 ## sigma  0.36    0.00 0.03  0.32  0.35  0.36  0.38  0.42  1098 1.00
 ## lp__  48.71    0.05 1.36 45.07 48.15 49.09 49.69 50.20   877 1.00
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:11:16 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:24:28 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -1737,7 +1737,7 @@ mod_sp &lt;- ulam(
 ## b[2]  0.32    0.00 0.04  0.26  0.30  0.32  0.34  0.39  2234    1
 ## lp__ 48.51    0.06 1.55 44.70 47.77 48.87 49.62 50.37   758    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:12:09 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:25:14 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>

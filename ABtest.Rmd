@@ -28,7 +28,7 @@ iris %>% group_by(Species) %>% summarise(n = n())
 
 Utilizando como única variable el ancho del sépalo (sepal width), ¿podemos inferir que los promedios de *versicolor* y una especie ficticia formada por las especies *virginica* y *setosa* provienen de distribuciones distintas?
 
-Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *virginica* y *setosa*. De esta manera nuestras dos muestras tendrán igual tamaño. 
+Creemos esa *otra especie* seleccionado aleatoriamente 50 filas de la combinación de *virginica* y *setosa*. De esta manera nuestras dos muestras tendrán igual tamaño. 
 
 ```{r}
 versicolor <- iris %>% 
@@ -112,7 +112,7 @@ Según el histograma y resumen de la distribución, no hubo ningún caso en que 
 length(permut_results[permut_results < diff(diference$mean)])
 ```
 
-Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
+Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una misma especie. 
 
 En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.
 
@@ -128,8 +128,8 @@ Podemos ver que la probabilidad de que ambos promedios provengan de una misma di
 
 ### 3. Enfoque frecuentista: modelo de regresión lineal.
 
-En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. 
-Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *versicolor*) y el coeficiente(pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
+En este caso modelaremos el valor del ancho del sépalo con respecto a cada una de las especies. 
+Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *versicolor*) y el coeficiente (pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
 
 
 ```{r}
