@@ -244,7 +244,7 @@ mod_brms <- brm(
 
 Los resultados son iguales a los generados con *Rethinking*.
 
-```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
+```{r}
 summary(mod_brms)
 ```
 
