@@ -1,7 +1,13 @@
 ---
 title: "Prueba de hipótesis"
-output: html_document
+output: 
+  html_document:
+    top: true
+    toc_float: true
 ---
+
+Elaborado por Guillermo A. Durán - gds506@gmail.com - @gds506
+Actualización: 15 de Junio 2019
 
 Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos promedios (*prueba de hipótesis*) utilizando tres técnicas distintas: 
 
