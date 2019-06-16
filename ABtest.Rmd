@@ -9,13 +9,14 @@ Notebook para mostrar y explorar cómo realizar en R un análisis estadístico d
 
 - análisis frecuentista (*t-test* y modelo de regresión lineal) y 
 
-- modelos bayesianos:
+- análisis bayesiano:
 
 Para el análisis utilizaremos el conjunto de datos *iris*.
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(datasets)
+set.seed(1234)
 data(iris)
 iris %>% group_by(Species) %>% summarise(n = n())
 ```
@@ -94,21 +95,21 @@ tibble(differences = permut_results) %>%
   geom_vline(xintercept = diff(diference$mean), colour = "red")
 ```
 
-La distribución de las permutaciones apenas logró acercarse a la diferencia medida entre *versicolor* y nuestra *otra especie*. Podemos ver esto más claramente con el resumen de la distribución de las permutaciones:
+La distribución de las permutaciones no logró acercarse a la diferencia medida entre *versicolor* y nuestra *otra especie*. Podemos ver esto más claramente con el resumen de la distribución de las permutaciones:
 
 ```{r}
 summary(permut_results)
 ```
 
-Según el histograma y resumen de la distribución, vemos que algunas de las permutaciones sí lograron superar el valor medido entre los promedios. Esto lo podemos cuantificar facilmente:
+Según el histograma y resumen de la distribución, no hubo ningún caso en que las permutaciones igualaran o sobrepasaran nuestro valor medido. 
 
 ```{r}
 length(permut_results[permut_results < diff(diference$mean)])
 ```
 
-Si tomamos en cuenta que únicamente 4 permutaciones de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/25000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
+Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una sola especie. 
 
-En otras palabras, tenemos certeza de que ambas muestras provienen de distribuciones distintas.
+En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.
 
 
 ### 2. Enfoque frecuentisa: Método *t-test* asumiendo varianzas distintas en ambas muestras.
@@ -174,7 +175,7 @@ Podemos ver en la columna *mean* que el valor de *b* (diferencia entre promedios
 
 Otra manera en que podemos calcular esta comparación entre promedios es creando distribuciones para los promedios de cada una de las especies.
 
-Para esto debemos asignar un índice distinto a cero para cada especie y crear un modelo donde cada una de las especies tendrá una intersección distinta. Para esta índice damos a *Versicolor* un valor igual a 2 y *otra especie* de 1.
+Para esto debemos asignar un índice distinto a cero para cada especie y crear un modelo donde cada una de las especies tendrá una intersección distinta. Como índice damos a *Versicolor* un valor igual a 2 y *otra especie* de 1.
 
 Notese que para el paquete Rethinking, los números asignados a estos índices deben de ser enteros.
 
@@ -229,6 +230,8 @@ ggplot(samples_df, aes(x = dist, y = valor)) +
 
 Podemos ver cómo la mayoría de los valores de cada una de las especies se encuentran agrupados alrededor de dos valores distintos, por lo que llegamos a la misma conclusión que con los metodos anteriores.
 
+#### Utilizando el paquete *brms*
+Además de la opción de usar el paquete *Rethinking* como interface a *Stan*, también podemos utilizar el paquete *brms*. Se adjunta el código para el mismo análisis utilizando varianzas de una misma distribución.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 library(brms)
@@ -239,27 +242,14 @@ mod_brms <- brm(
 )
 ```
 
+Los resultados son iguales a los generados con *Rethinking*.
+
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 summary(mod_brms)
 ```
 
-Now including unequal variances:
-```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
-mod_brms_frm <- bf(SepalWidth ~ Species, sigma ~ Species)
-
-mod_brms_var <- brm(
-  mod_brms_frm, 
-  data = analysis, 
-  cores=2)
-```
-
+Con la función *plot* podemos ver las distribuciones de cada parámetro del modelo, además del *trace plot* de las cadenas de Markov. 
 
 ```{r}
-summary(mod_brms_var)
+plot(mod_brms)
 ```
-
-```{r}
-plot(mod_brms_var)
-```
-
-
