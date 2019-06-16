@@ -135,8 +135,7 @@ Para esto la intersección del modelo tendrá el valor del promedio de una espec
 ```{r}
 #convertimos a setosa a valor 1 y a otra especie a valor 0
 analysis_classified <- analysis %>% 
-  mutate(sp_id = case_when(Species == "versicolor" ~ as.integer(1),
-                           Species == "otraSp" ~ as.integer(0))) %>% 
+  mutate(sp_id = as.integer(if_else(Species == "versicolor", 1, 0))) %>% 
   select(sp_id, SepalWidth)
 
 linmod <- lm(SepalWidth ~ sp_id, data = analysis_classified)
@@ -170,13 +169,13 @@ diff_mod <- ulam(
   ), data = analysis_classified, chains=4)
 ```
 
-Con la función *summary* podemos ver el resumen de los valores de cada variable:
+Con la función *summary* vemos el resumen de los valores de cada variable:
 
 ```{r}
 summary(diff_mod)
 ```
 
-Podemos ver en la columna *mean* que el valor de *b* (diferencia entre promedios) es similar al del modelo lineal frecuentista, pero a diferencia del otro, tenemos una distribución completa de esa variable. El intervalo de credibilidad para esa variable no incluye el cero, por lo que nuestra conclusión es igual a la de los métodos anteriores.
+Vemos en la columna *mean* que el valor de *b* (diferencia entre promedios) es similar al del modelo lineal frecuentista, pero a diferencia del otro, tenemos una distribución completa de esa variable. El intervalo de credibilidad para esa variable se muestra en las columnas de percentiles (con el signo de porcentaje al lado) y según estos valores su rango no incluye al cero, por lo que llegamos a la misma conclusión que con los métodos anteriores.
 
 Otra manera en que podemos calcular esta comparación entre promedios es creando distribuciones para los promedios de cada una de las especies.
 
@@ -186,8 +185,7 @@ Notese que para el paquete Rethinking, los números asignados a estos índices d
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
 an_reth2 <- analysis %>% 
-  mutate(Sp = as.integer(case_when(Species == "versicolor" ~ 2,
-                                   Species != "versicolor" ~ 1))) %>% 
+  mutate(Sp = as.integer(if_else(Species == "versicolor", 2, 1))) %>% 
   select(Sp, SepalWidth)
 
 mod_sp <- ulam(
@@ -200,8 +198,8 @@ mod_sp <- ulam(
   ), data = an_reth2, chains=4)
 ```
 
-Ahora con la función *summary* (o también *precis*) vemos el resumen de los valores de cada variable.
-Se puede notar que las distribuciones de **a1** (distribución del promedio de *otra especie*) y **a2** (distribución del promedio de *Versicolor*) no se sobreponen. En el caso de **a1** el 95% de la distribución se encuentra entre 2.97 y 3.19, mientras que para **a2** va de 2.68 a 2.86.
+Ahora con la función *summary* (o *precis*) vemos el resumen de los valores de cada variable.
+Se puede notar que las distribuciones de **a1** (distribución del promedio de *otra especie*) y **a2** (distribución del promedio de *Versicolor*) no se sobreponen. En el caso de **a1** el 95% de la distribución se encuentra entre 3.05 y 3.28, mientras que para **a2** va de 2.68 a 2.87.
 
 ```{r}
 summary(mod_sp)
