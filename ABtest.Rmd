@@ -3,7 +3,7 @@ title: "Prueba de hipótesis"
 output: html_document
 ---
 
-Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos medias (*prueba de hipótesis*) utilizando tres técnicas distintas: 
+Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos promedios (*prueba de hipótesis*) utilizando tres técnicas distintas: 
 
 - de simulación (*permutaciones*), 
 
@@ -21,9 +21,9 @@ data(iris)
 iris %>% group_by(Species) %>% summarise(n = n())
 ```
 
-Utilizando como única variable el ancho del sépalo (sepal width), ¿es la distribución de esa variable en  *versicolor* distinta a la de una especie ficticia formada por la mezcla de las especies *virginica* y *setosa*?
+Utilizando como única variable el ancho del sépalo (sepal width), ¿podemos inferir que los promedios de *versicolor* y una especie ficticia formada por las especies *virginica* y *setosa* provienen de distribuciones distintas?
 
-Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *virginica* y *setosa*. De esta manera nuestras dos muestras tendrán el mismo tamaño. 
+Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de *virginica* y *setosa*. De esta manera nuestras dos muestras tendrán igual tamaño. 
 
 ```{r}
 versicolor <- iris %>% 

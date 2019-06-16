@@ -378,7 +378,7 @@ $(document).ready(function () {
 </div>
 
 
-<p>Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos medias (<em>prueba de hipótesis</em>) utilizando tres técnicas distintas:</p>
+<p>Notebook para mostrar y explorar cómo realizar en R un análisis estadístico de comparación de dos promedios (<em>prueba de hipótesis</em>) utilizando tres técnicas distintas:</p>
 <ul>
 <li><p>de simulación (<em>permutaciones</em>),</p></li>
 <li><p>análisis frecuentista (<em>t-test</em> y modelo de regresión lineal) y</p></li>
@@ -396,8 +396,8 @@ iris %&gt;% group_by(Species) %&gt;% summarise(n = n())</code></pre>
 ## 1 setosa        50
 ## 2 versicolor    50
 ## 3 virginica     50</code></pre>
-<p>Utilizando como única variable el ancho del sépalo (sepal width), ¿es la distribución de esa variable en <em>versicolor</em> distinta a la de una especie ficticia formada por la mezcla de las especies <em>virginica</em> y <em>setosa</em>?</p>
-<p>Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de <em>virginica</em> y <em>setosa</em>. De esta manera nuestras dos muestras tendrán el mismo tamaño.</p>
+<p>Utilizando como única variable el ancho del sépalo (sepal width), ¿podemos inferir que los promedios de <em>versicolor</em> y una especie ficticia formada por las especies <em>virginica</em> y <em>setosa</em> provienen de distribuciones distintas?</p>
+<p>Creemos esa otra especie seleccionado aleatoriamente 50 filas de la combinación de <em>virginica</em> y <em>setosa</em>. De esta manera nuestras dos muestras tendrán igual tamaño.</p>
 <pre class="r"><code>versicolor &lt;- iris %&gt;% 
   filter(Species == 'versicolor') %&gt;% 
   mutate(Species = as.character(Species)) %&gt;%
@@ -532,7 +532,7 @@ diff_mod &lt;- ulam(
 ## sigma  0.36    0.00 0.03  0.32  0.35  0.36  0.38  0.42  1098 1.00
 ## lp__  48.71    0.05 1.36 45.07 48.15 49.09 49.69 50.20   877 1.00
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:21:31 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:37:58 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -566,7 +566,7 @@ mod_sp &lt;- ulam(
 ## b[2]  0.32    0.00 0.04  0.26  0.30  0.32  0.34  0.39  2234    1
 ## lp__ 48.51    0.06 1.55 44.70 47.77 48.87 49.62 50.37   758    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:22:18 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:39:01 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
