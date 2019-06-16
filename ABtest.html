@@ -1629,8 +1629,8 @@ permut_results &lt;- replicate(10e4, species_sample(analysis))</code></pre>
 <p>Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de <em>versicolor</em> y <em>otra especie</em> se produzca al azar si ambas distribuciones pertenecieran a una sola especie.</p>
 <p>En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.</p>
 </div>
-<div id="enfoque-frecuentisa-metodo-t-test-asumiendo-varianzas-distintas-en-ambas-muestras." class="section level3">
-<h3>2. Enfoque frecuentisa: Método <em>t-test</em> asumiendo varianzas distintas en ambas muestras.</h3>
+<div id="enfoque-frecuentista-metodo-t-test-asumiendo-varianzas-distintas-en-ambas-muestras." class="section level3">
+<h3>2. Enfoque frecuentista: Método <em>t-test</em> asumiendo varianzas distintas en ambas muestras.</h3>
 <pre class="r"><code>t.test(versicolor$SepalWidth, otraSp$SepalLength)</code></pre>
 <pre><code>## 
 ##  One Sample t-test
@@ -1645,8 +1645,8 @@ permut_results &lt;- replicate(10e4, species_sample(analysis))</code></pre>
 ##      2.77</code></pre>
 <p>Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16), también claro en que el rango de los intervalos de confianza no cubren el cero.</p>
 </div>
-<div id="enfoque-frecuentisa-modelo-de-regresion-lineal." class="section level3">
-<h3>3. Enfoque frecuentisa: modelo de regresión lineal.</h3>
+<div id="enfoque-frecuentista-modelo-de-regresion-lineal." class="section level3">
+<h3>3. Enfoque frecuentista: modelo de regresión lineal.</h3>
 <p>En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso <em>versicolor</em>) y el coeficiente(pendiente) representa la diferencia entre esa <em>otra especie</em> y <em>versicolor</em>.</p>
 <pre class="r"><code>#convertimos a setosa a valor 1 y a otra especie a valor 0
 analysis_classified &lt;- analysis %&gt;% 
@@ -1678,9 +1678,9 @@ summary(linmod)</code></pre>
 <p>Nota: Vale aclarar que la función <em>lm</em> de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para <em>versicolor</em> y 0 para <em>otraSP</em>), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete <em>Rethinking</em> en la creación del modelo bayesiano.</p>
 </div>
 <div id="enfoque-bayesiano-utilizando-el-paquete-rethinking-como-interface-a-la-herramienta-stan." class="section level3">
-<h3>4. Enfoque bayesiano utilizando el paquete <em>Rethinking</em> como interface a la herramienta <em>Stan</em>.</h3>
-<p>La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución posterior de los valores de cada variable.</p>
-<p>El modelo se especifíca en el chunk siguiente y se lee como: el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde <em>a</em> (la intersección) es el valor promedio de <em>otra especie</em> y <em>b</em> es el promedio de la diferencia entre <em>otra especie</em> y <em>versicolor</em>. Como previos de <em>a</em> y <em>b</em> utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1. Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.</p>
+<h3>4. Enfoque bayesiano utilizando el paquete <a href="https://github.com/rmcelreath/statrethinking_winter2019#r-package"><em>Rethinking</em></a> como interface a la herramienta <em>Stan</em>.</h3>
+<p>La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución <em>posterior</em> de los valores de cada variable.</p>
+<p>El modelo se especifíca en el chunk siguiente y se lee como: El valor del ancho del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal, donde <em>a</em> (la intersección) es el valor promedio de <em>otra especie</em> y <em>b</em> es el promedio de la diferencia entre <em>otra especie</em> y <em>versicolor</em>. Como previos de <em>a</em> y <em>b</em> utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1. Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.</p>
 <pre class="r"><code>library(rethinking)
 
 diff_mod &lt;- ulam(
@@ -1703,7 +1703,7 @@ diff_mod &lt;- ulam(
 ## sigma  0.36    0.00 0.03  0.32  0.35  0.36  0.38  0.42  1098 1.00
 ## lp__  48.71    0.05 1.36 45.07 48.15 49.09 49.69 50.20   877 1.00
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:56:09 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:05:32 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -1737,7 +1737,7 @@ mod_sp &lt;- ulam(
 ## b[2]  0.32    0.00 0.04  0.26  0.30  0.32  0.34  0.39  2234    1
 ## lp__ 48.51    0.06 1.55 44.70 47.77 48.87 49.62 50.37   758    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 18:57:05 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:06:18 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>

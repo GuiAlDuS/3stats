@@ -117,7 +117,7 @@ Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alc
 En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.
 
 
-### 2. Enfoque frecuentisa: Método *t-test* asumiendo varianzas distintas en ambas muestras.
+### 2. Enfoque frecuentista: Método *t-test* asumiendo varianzas distintas en ambas muestras.
 
 ```{r}
 t.test(versicolor$SepalWidth, otraSp$SepalLength)
@@ -126,7 +126,7 @@ t.test(versicolor$SepalWidth, otraSp$SepalLength)
 Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16), también claro en que el rango de los intervalos de confianza no cubren el cero.
 
 
-### 3. Enfoque frecuentisa: modelo de regresión lineal.
+### 3. Enfoque frecuentista: modelo de regresión lineal.
 
 En este caso modelaremos el valor del largo del sépalo con respecto a cada una de las especies. 
 Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *versicolor*) y el coeficiente(pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
@@ -149,12 +149,12 @@ Nota:
 Vale aclarar que la función *lm* de R no necesita que la variable categórica (especie) sea conviertida en numérica (1 para *versicolor* y 0 para *otraSP*), pero preferimos hacera desde el inicio ya que esta transformación es necesaria para cuando más adelante utilizemos las funciones del paquete *Rethinking* en la creación del modelo bayesiano.
 
 
-### 4. Enfoque bayesiano utilizando el paquete *Rethinking* como interface a la herramienta *Stan*.
+### 4. Enfoque bayesiano utilizando el paquete [*Rethinking*](https://github.com/rmcelreath/statrethinking_winter2019#r-package) como interface a la herramienta *Stan*.
 
-La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución posterior de los valores de cada variable. 
+La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución *posterior* de los valores de cada variable. 
 
 El modelo se especifíca en el chunk siguiente y se lee como: 
-el valor del largo del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *versicolor*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
+El valor del ancho del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal, donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *versicolor*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
 Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
