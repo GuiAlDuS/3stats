@@ -75,7 +75,7 @@ La diferencia entre ambos promedios es de:
 
 ### 1. Método de permutaciones (también llamado de aleatorización o *randomizations*):
 
-Si ambas muestras pertenecieran a una misma especie (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?
+Si ambas muestras pertenecieran a una misma distribución (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?
 
 Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus medias. En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
 

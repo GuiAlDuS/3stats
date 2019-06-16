@@ -1603,7 +1603,7 @@ analysis &lt;- bind_rows(versicolor, otraSp)</code></pre>
 <pre><code>## [1] -0.394</code></pre>
 <div id="metodo-de-permutaciones-tambien-llamado-de-aleatorizacion-o-randomizations" class="section level3">
 <h3>1. Método de permutaciones (también llamado de aleatorización o <em>randomizations</em>):</h3>
-<p>Si ambas muestras pertenecieran a una misma especie (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?</p>
+<p>Si ambas muestras pertenecieran a una misma distribución (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?</p>
 <p>Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus medias. En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias.</p>
 <pre class="r"><code>species_sample &lt;- function(analysis){
   other1_indx &lt;- sample(1:nrow(analysis), 50, replace = FALSE)
@@ -1703,7 +1703,7 @@ diff_mod &lt;- ulam(
 ## sigma  0.36    0.00 0.03  0.32  0.35  0.36  0.38  0.42  1098 1.00
 ## lp__  48.71    0.05 1.36 45.07 48.15 49.09 49.69 50.20   877 1.00
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:05:32 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:11:16 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -1737,7 +1737,7 @@ mod_sp &lt;- ulam(
 ## b[2]  0.32    0.00 0.04  0.26  0.30  0.32  0.34  0.39  2234    1
 ## lp__ 48.51    0.06 1.55 44.70 47.77 48.87 49.62 50.37   758    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:06:18 2019.
+## Samples were drawn using NUTS(diag_e) at Sat Jun 15 19:12:09 2019.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
