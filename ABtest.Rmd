@@ -123,7 +123,7 @@ En otras palabras, tenemos gran certeza de que ambas muestras provienen de distr
 t.test(versicolor$SepalWidth, otraSp$SepalLength)
 ```
 
-Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16), también claro en que el rango de los intervalos de confianza no cubren el cero.
+Podemos ver que la probabilidad de que ambos promedios provengan de una misma distribución es sumamente baja (menor a 2.2e-16).
 
 
 ### 3. Enfoque frecuentista: modelo de regresión lineal.
