@@ -77,7 +77,7 @@ La diferencia entre ambos promedios es de:
 
 Si ambas muestras pertenecieran a una misma distribución (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?
 
-Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus medias. En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
+Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus promedios En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
 
 ```{r}
 species_sample <- function(analysis){
@@ -129,7 +129,7 @@ Podemos ver que la probabilidad de que ambos promedios provengan de una misma di
 ### 3. Enfoque frecuentista: modelo de regresión lineal.
 
 En este caso modelaremos el valor del ancho del sépalo con respecto a cada una de las especies. 
-Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *versicolor*) y el coeficiente (pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
+Para esto la intersección del modelo tendrá el valor del promedio de una especie (en este caso *otra especie*) y el coeficiente (pendiente) representa la diferencia entre esa *otra especie* y *versicolor*.
 
 
 ```{r}

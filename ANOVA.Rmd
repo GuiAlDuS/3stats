@@ -1,0 +1,39 @@
+---
+title: "Analísis entre grupos (ANOVA)"
+author: "Guillermo Durán"
+date: "27 de julio de 2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+En este notebook exploraremos las diferentes maneras para hacer comparaciones entre grupos de muestras, también conocido como análisis de varianza (ANOVA).
+
+Al igual que en el documento anterior, se seguiran tres distintos enfoques estadísticos: a través de permutaciones, utilizando las herramientas de la estadística frecuentísta tradicional (ANOVA) y por medio de un análisis bayesiano.
+
+Para el ejemplo utilizaremos el conjunto de datos del tidytuesday de la base de datos de la FAA sobre colisiones de aves con aviones. [El enlace a los datos está acá](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-07-23).
+
+
+```{r}
+wildlife_impacts <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-07-23/wildlife_impacts.csv")
+
+```
+
+```{r}
+summary(wildlife_impacts)
+```
+
+```{r}
+library(tidyverse)
+wildlife_impacts %>% group_by(time_of_day) %>% summarise(n())
+```
+
+```{r}
+wildlife_impacts %>% ggplot(aes(x = cost_repairs_infl_adj)) + geom_histogram()
+```
+
