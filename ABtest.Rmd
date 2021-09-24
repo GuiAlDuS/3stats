@@ -77,7 +77,7 @@ La diferencia entre ambos promedios es de:
 
 Si ambas muestras pertenecieran a una misma distribución (hipótesis nula), ¿qué tan común sería tener nuestra diferencia entre promedios?
 
-Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus promedios En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
+Para esto combinamos ambas muestras y muestramos al azar dos grupos (mitades). Con estas dos muestras comparamos la diferencia entre sus promedios. En el caso de este ejemplo repetimos el muestreo 100 000 veces y creamos un histograma con esas diferencias. 
 
 ```{r}
 species_sample <- function(analysis){
@@ -112,7 +112,7 @@ Según el histograma y resumen de la distribución, no hubo ningún caso en que 
 length(permut_results[permut_results < diff(diference$mean)])
 ```
 
-Si tomamos en cuenta que ninguna permutación de un total de 100000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una misma especie. 
+Si tomamos en cuenta que ninguna permutación de un total de 100 000 lograron alcanzar la diferencia medida, podemos decir entonces que existe una probabilidad muy baja (menor a 1/100 000) de que la diferencia medida entre los promedios de *versicolor* y *otra especie* se produzca al azar si ambas distribuciones pertenecieran a una misma especie. 
 
 En otras palabras, tenemos gran certeza de que ambas muestras provienen de distribuciones distintas.
 
@@ -150,10 +150,20 @@ Vale aclarar que la función *lm* de R no necesita que la variable categórica (
 
 ### 4. Enfoque bayesiano utilizando el paquete [*Rethinking*](https://github.com/rmcelreath/statrethinking_winter2019#r-package) como interface a la herramienta *Stan*.
 
-La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución *posterior* de los valores de cada variable. 
+La idea del modelo bayesiano de este ejemplo es similar al modelo de regresión lineal utilizado en el apartado anterior, pero, como en todo modelo bayesiano, se generará una distribución *posterior* con los posibles valores de cada variable. 
 
 El modelo se especifíca en el chunk siguiente y se lee como: 
+
+$$
+SepalWidth \sim Norm(\mu, \sigma) \\
+\mu = a + b \times SpID \\
+a \sim Norm(4, 1) \\
+b \sim Norm(1, 1) \\
+\sigma \sim Exp(1)
+$$
+
 El valor del ancho del sépalo proviene de una distribución normal donde el promedio está en función de la regresión lineal, donde *a* (la intersección) es el valor promedio de *otra especie* y *b* es el promedio de la diferencia entre *otra especie* y *versicolor*. Como previos de *a* y *b* utilizamos distribuciones normales con promedio 4 y 1 respectivamente, y desviaciones estándard iguales a 1.
+
 Para la desviación estándard de la verosimilitud, utilizamos una distribución exponencial con parámetro igual a 1, asegurándonos así que los valores serán únicamente positivos y facilitandole al algoritmo MCMC encontrar los valores de los parámetros.
 
 ```{r message=FALSE, warning=FALSE, results=FALSE, collapse=TRUE}
@@ -166,7 +176,7 @@ diff_mod <- ulam(
     a ~ dnorm(4, 1),
     b ~ dnorm(1, 1),
     sigma ~ dexp(1)
-  ), data = analysis_classified, chains=4)
+  ), data = analysis_classified, chains=4, cores = 4, cmdstan = TRUE)
 ```
 
 Con la función *summary* vemos el resumen de los valores de cada variable:
@@ -195,7 +205,7 @@ mod_sp <- ulam(
     sigma <- b[Sp],
     a[Sp] ~ dnorm(4, 1),
     b[Sp] ~ dexp(1)
-  ), data = an_reth2, chains=4)
+  ), data = an_reth2, chains=4, cores = 4, cmdstan = TRUE)
 ```
 
 Ahora con la función *summary* (o *precis*) vemos el resumen de los valores de cada variable.
@@ -217,7 +227,7 @@ Otra manera de elaborar esta misma comparación de distribuciones es extrayendo 
 samples <- extract.samples(mod_sp, n = 100000)
 ```
 
-Esta función nos genera una lista con cada una de las variables del modelo y dentro de cada uno de los elementos de la lista tenemos una matriz donde las columnas representan los índices utilizados en el modelo, la primer columna son valores modelados para el índice 1 y la segunda para el 2. 
+Esta función nos genera una lista con cada una de las variables del modelo y dentro de cada uno de los elementos de la lista tenemos una matriz donde las columnas representan los índices utilizados en el modelo, la primera columna son valores modelados para el índice 1 y la segunda para el 2. 
 
 Estas muestras representan la distribución de cada una de esas variables, por lo que podemos utilizarlas para graficarlas.
 
