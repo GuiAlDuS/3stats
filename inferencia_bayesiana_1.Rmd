@@ -1,5 +1,7 @@
 ---
 title: "Introducción a la inferencia bayesiana"
+author: "Guillermo A. Durán"
+date: "26 de setiembre de 2021"
 output:
   html_document:
     df_print: paged
