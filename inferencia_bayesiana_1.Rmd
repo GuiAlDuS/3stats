@@ -1,0 +1,281 @@
+---
+title: "Introducción a la inferencia bayesiana"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r message=FALSE, warning=FALSE}
+library(rethinking)
+```
+
+# El modelo generador de datos:
+
+Usamos la distribución normal como ejemplo de cómo originar un valor desde un modelo generador de datos.
+
+```{r}
+t <- rnorm(1, mean = 7, sd = 1.5)
+t
+```
+
+Nuestro valor *t* es generado por una función con parámetros conocidos (los parámetros en el caso de una distribución normal son el promedio y desviación estándard). Cada vez que creamos un valor desde un modelo generador de datos, este valor fluctuará según las características propias del modelo.
+
+El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él? (concepto de *verosimilitud*). Sobre la verosimilitud se hablará más adelante.
+
+```{r}
+dnorm(t, mean = 7, sd = 1.5)
+```
+
+## Generando nuestros datos: siendo los dueños de nuestro universo
+
+Ahora en vez de crear un único valor, vamos a crear un vector con 400 valores desde nuestro modelo generador de datos.
+
+Además, si exploramos ese vector vemos cómo se reflejan las características (parámetros: promedio y desviación estándard) de nuestro modelo generador de datos.
+
+```{r}
+n = 400
+
+w <- rnorm(n, mean = 7, sd = 1.5)
+
+hist(w, breaks = 20)
+mean(w)
+sd(w)
+```
+
+Ahora pensemos que en nuestro universo la altura de una planta está dada por dos factores (variables) de la siguiente manera:
+
+$$
+y = b_1w + b_2z
+$$
+
+donde:
+
+y = altura de la planta
+
+w = cantidad de agua
+
+$b_1$ = coeficiente que nos indica el aporte de la cantidad de agua en la altura de la planta
+
+z = cantidad de luz
+
+$b_2$ = coeficiente que nos indica el aporte de la cantidad de luz en la altura de la planta
+
+Ya que nosotros mismos creamos nuestros datos, podemos calcular los valores "reales" que tendría la variable $y$ (la altura de la planta) en cada una de nuestras combinaciones de valores de agua y luz. Para esto aprovechamos las facilidades que nos brindan las operaciones vectoriales de R.
+
+```{r}
+z <- runif(n, min = 5, max = 9)
+
+b1 <- rnorm(n, mean = 5, sd = 0.7)
+b2 <- rnorm(n, mean = 0.3, sd = 0.1)
+
+y <- b1*w + b2*z
+
+df <- data.frame(
+  y = y,
+  w = w,
+  z = z
+)
+
+head(df)
+```
+
+Con histogramas podemos ver sus distribuciones:
+
+```{r message=FALSE, warning=FALSE}
+hist(df$y, breaks = 20)
+hist(df$w, breaks = 20)
+hist(df$z, breaks = 20)
+```
+
+Ya que conocemos los valores reales de nuestros coeficientes ($a$ y $b$), podemos saber cuál valor tendría $y$ (la altura de la planta) con una combinación cualquiera de $w$ y $z$ (agua y luz).
+
+```{r}
+w1 = 3
+z1 = 9
+
+
+mean(b1*w1 + b2*z1)
+```
+
+## Inferencia estadística tradicional:
+
+En estadística inferencial, normalmente estimamos los valores de los coeficientes $b_1$ y $b_2$.
+
+Dado que al generar nuestros datos sabemos los verdaderos valores de los coeficientes, podemos evaluar su similitud con las estimaciones hechas con métodos trandicionales de inferencia estadística.
+
+Usando una regresión lineal:
+
+```{r}
+mod1 <- lm(y ~ w + z, df)
+mod1 |> summary()
+```
+
+Los coeficientes se acercan a nuestros valores reales, pero nótese cómo para el coeficiente de $z$ ($b_2$), el resumen nos dice que no es "estadísticamente significativo".
+
+Luego de estimarse los coeficientes, podemos hacer una predicción:
+
+```{r}
+predict(mod1, 
+        data.frame(w = w1, z = z1))
+
+```
+
+Vease la cercanía con nuestro valor verdadero.
+
+## Inferencia bayesiana:
+
+En inferencia bayesiana es necesario plantear un modelo generador de datos y este debe ajustarse al conocimiento que tengamos del proceso que pensemos ha podido generar los datos observados. En nuestro caso podemos utilizar:
+
+$$
+y \sim Normal(\mu, \sigma) \\
+\mu = b_1w + b_2z \\
+b_1 \sim Uniform(0,15) \\
+b_2 \sim Uniform(0,15) \\
+\sigma \sim Exp(1)
+$$
+
+El modelo se lee: $y$ proviene de una distribución normal donde su promedio está en función de una regresión lineal de $w$ y $z$.
+
+Notese que a nuestras incógnitas ($\sigma$, $b_1$ y $b_2$ ) les asignamos distribuciones de "posibles valores" (a estas distribuciones también se le llaman "previas"). Durante el ajuste del modelo, él se encargará de encontrar las distribuciones más adecuadas según nuestros datos.
+
+El modelo ahora debe ser codificado y en este caso usamos la sintaxis de la librería Rethinking. Esta librería "traduce" el código desde R al lenguaje del programa Stan y lo ejecuta.
+
+```{r message=FALSE, warning=FALSE}
+mod2 <- ulam(
+  alist(
+    y ~ dnorm(mu, sig),
+    mu <- b1*w + b2*z,
+    b1 ~ dunif(0, 15),
+    b2 ~ dunif(0, 15),
+    sig ~ dexp(1)
+  ), data = df, chains = 4, cores = 4, cmdstan = TRUE
+)
+```
+
+Luego de que el modelo ha terminado de ajustarse, podemos ver los valores de nuestras incógnitas (distribución posterior):
+
+```{r}
+precis(mod2)
+plot(precis(mod2))
+
+smpls <- extract.samples(mod2)
+hist(smpls$b1)
+
+```
+
+Notese cómo a pesar de haber usado previas no informativas, el modelo logró muy bien actualizarlas a valores posibles muy cercanos a la realidad. Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia presentada (datos).
+
+### Ahora la predicción:
+
+Ya que en el modelo bayesiano todas nuestras incógnitas son distribuciones, al calcular una predicción el modelo usa muestras de los posibles valores de las incógnitas ($b_1$ y $b_2$) actualizadas según nuestros datos. Calcular la predicción utilizando los posibles valores de nuestras incógnitas facilita mostrar la incertidumbre de nuestra predicción.
+
+```{r}
+y_hat_sim <- sim(mod2, 
+             data.frame(w = 3, z = 9))
+head(y_hat_sim)
+hist(y_hat_sim, breaks = 20)
+mean(y_hat_sim)
+quantile(y_hat_sim, probs = c(0.05, 0.5, 0.95))
+```
+
+Ahora no solo tenemos una estimación puntual del posible valor de nuestra predicción, sino toda una distribución de posibles valores. Esto da la posibilidad de mostrar con certeza (dado el modelo) los rangos de valores dentro de los cuales estarían los valores más probables de nuestra predicción.
+
+Utilizar valores simulados de nuestra distribución posterior también nos permite evaluar la probabilidad de tener valores mayores o menores de cierto umbral.
+
+Por ejemplo, en este caso es muy sencillo calcular la probabilidad de que el valor $y$ para $w$ y $z$ iguales a 3 y 9 sea mayor a 10:
+
+```{r}
+sum(y_hat_sim > 10) / length(y_hat_sim)
+```
+
+O que esté entre 10 y 20:
+
+```{r}
+sum(y_hat_sim > 10 & y_hat_sim < 20) / length(y_hat_sim)
+```
+
+El código en Stan:
+
+```{r}
+stancode(mod2)
+```
+
+------------------------------------------------------------------------
+
+Una pequeña explicación práctica de qué es la máxima verosimilitud (**maximum likelihood**):
+
+Para esto nos planteamos la siguiente pregunta: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos?
+
+¿Cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$? En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
+
+En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal:
+
+```{r}
+t
+
+#secuencia de valores enteros entre 3 y 17 con los que calcularemos la verosimilitud para t
+mean_eval <- seq(from = 3, to = 17)
+
+likelihood <- dnorm(t, mean = mean_eval, sd = 1.5) |> 
+  (\(x) round(x, 5))()
+
+df <- data.frame(mean_eval = mean_eval, likelihood = likelihood)
+
+barplot(height = df$likelihood, names.arg = df$mean_eval)
+
+df[which.max(df$likelihood),]
+
+```
+
+Vemos que para un solo valor, los parámetros del modelo generador puede que no sean los más probables.
+
+¿Y qué tal si en vez de evaluar un solo valor, calculamos la máxima verosimilitud para un vector de valores producto de nuestro modelo generador de datos?
+
+```{r}
+
+#creamos un vector de n valores (400) de una distribución normal con parametros 7 y 1.5
+t_vec <- rnorm(n, mean = 7, sd = 1.5)
+
+#creamos una función que evaluará los diferentes valores del promedio mean_eval para cada elemento del vector t_vec
+likelihood_fun <- function(x) dnorm(t_vec, mean = x, sd = 1.5)
+
+#aplicamos la función a cada valor mean_eval (secuencia de valores enteros entre 3 y 17)
+#la lista resultante contiene 15 elementos (mean_eval) y cada uno de esos elementos contiene las 400 verosimilitudes (n) según el mean_eval específico
+lklhd_l <- lapply(mean_eval, likelihood_fun)
+
+#calculamos el promedio de la verosimilitud para cada uno de los 15 valores de mean_eval
+lklhd_mean <- lapply(lklhd_l, mean) |> unlist()
+
+#y la convertimos en un dataframe con su respectivo valor de mean_eval
+df <- data.frame(mean_eval = mean_eval, 
+                 mean_likelihood = lklhd_mean)
+
+barplot(height = df$mean_likelihood, names.arg = df$mean_eval)
+
+df[which.max(df$mean_likelihood),]
+
+```
+
+Vemos que cuando tomamos en cuenta un serie de valores producidos por nuestro modelo generador de datos, la máxima verosimilitud para el parámetro que evaluamos refleja el valor real con el que se generaron los datos. En este caso vemos que de los 15 valores con que evaluamos el parámetro del promedio de nuestro modelo generador de datos (usando el vector de 400 elementos), el 7 resultó ser el que tiene la mayor verosimilitud para el promedio de la distribución normal.
+
+Con las funciones de densidad de las distribuciones también podemos graficar sus *pdf*s (*probability density functions*):
+
+```{r}
+x_norm <- seq(0, 15, by = .1)
+y_norm <- dnorm(x_norm, mean = 7, sd = 1.5)
+plot(x_norm, y_norm)
+
+dnorm(9, mean = 7, sd = 1.5)
+```
+
+Algo más sobre el muestreo del HMC detrás de STAN: los trace plots
+
+```{r}
+traceplot(mod2)
+```
+
+Y finalmente, todo esto viene del teorema de Bayes:
+
+$$
+p(h|d) = \frac{p(d|h) p(h)}{p(d)}
+$$
