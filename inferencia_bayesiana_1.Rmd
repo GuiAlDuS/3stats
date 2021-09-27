@@ -1,7 +1,7 @@
 ---
 title: "Introducción a la inferencia bayesiana"
 author: "Guillermo A. Durán"
-date: "26 de setiembre de 2021"
+date: "27 de setiembre de 2021"
 output:
   html_document:
     df_print: paged
@@ -22,7 +22,7 @@ t
 
 Nuestro valor *t* es generado por una función con parámetros conocidos (los parámetros en el caso de una distribución normal son el promedio y desviación estándard). Cada vez que creamos un valor desde un modelo generador de datos, este valor fluctuará según las características propias del modelo.
 
-El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él? (concepto de *verosimilitud*). Sobre la verosimilitud se hablará más adelante.
+El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él?. A esta estimación se le llama *verosimilitud* y se hablará de ella al final del notebook.
 
 ```{r}
 dnorm(t, mean = 7, sd = 1.5)
@@ -32,7 +32,7 @@ dnorm(t, mean = 7, sd = 1.5)
 
 Ahora en vez de crear un único valor, vamos a crear un vector con 400 valores desde nuestro modelo generador de datos.
 
-Además, si exploramos ese vector vemos cómo se reflejan las características (parámetros: promedio y desviación estándard) de nuestro modelo generador de datos.
+Si exploramos ese vector vemos cómo se reflejan las características (parámetros: promedio y desviación estándard) de nuestro modelo generador de datos.
 
 ```{r}
 n = 400
@@ -44,7 +44,7 @@ mean(w)
 sd(w)
 ```
 
-Ahora pensemos que en nuestro universo la altura de una planta está dada por dos factores (variables) de la siguiente manera:
+Ahora pensemos que en nuestro universo la altura de una planta está dada por dos factores (variables) en una relación según la siguiente ecuación:
 
 $$
 y = b_1w + b_2z
@@ -52,13 +52,13 @@ $$
 
 donde:
 
-y = altura de la planta
+$y$ = altura de la planta
 
-w = cantidad de agua
+$w$ = cantidad de agua
 
 $b_1$ = coeficiente que nos indica el aporte de la cantidad de agua en la altura de la planta
 
-z = cantidad de luz
+$z$ = cantidad de luz
 
 $b_2$ = coeficiente que nos indica el aporte de la cantidad de luz en la altura de la planta
 
@@ -126,7 +126,7 @@ Vease la cercanía con nuestro valor verdadero.
 
 ## Inferencia bayesiana:
 
-En inferencia bayesiana es necesario plantear un modelo generador de datos y este debe ajustarse al conocimiento que tengamos del proceso que pensemos ha podido generar los datos observados. En nuestro caso podemos utilizar:
+En inferencia bayesiana es necesario plantear un modelo generador de datos y este debe ajustarse al conocimiento que tengamos del proceso que pensemos ha generado los datos observados. En nuestro caso podemos utilizar:
 
 $$
 y \sim Normal(\mu, \sigma) \\
@@ -154,7 +154,7 @@ mod2 <- ulam(
 )
 ```
 
-Luego de que el modelo ha terminado de ajustarse, podemos ver los valores de nuestras incógnitas (distribución posterior):
+Luego de que el modelo ha terminado de ajustarse, podemos ver los valores de nuestras incógnitas (distribución posterior) tanto puntualmente como a manera de distribuciones:
 
 ```{r}
 precis(mod2)
@@ -165,11 +165,11 @@ hist(smpls$b1)
 
 ```
 
-Notese cómo a pesar de haber usado previas no informativas, el modelo logró muy bien actualizarlas a valores posibles muy cercanos a la realidad. Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia presentada (datos).
+Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en el modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas (cualquier valor posible entre dos límites), al calcular la posterior el modelo logró muy bien actualizarlas a valores posibles muy cercanos a la realidad. Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia presentada (datos).
 
 ### Ahora la predicción:
 
-Ya que en el modelo bayesiano todas nuestras incógnitas son distribuciones, al calcular una predicción el modelo usa muestras de los posibles valores de las incógnitas ($b_1$ y $b_2$) actualizadas según nuestros datos. Calcular la predicción utilizando los posibles valores de nuestras incógnitas facilita mostrar la incertidumbre de nuestra predicción.
+Ya que en el modelo bayesiano todas nuestras incógnitas son distribuciones, al calcular una predicción el modelo usa muestras de los posibles valores de las incógnitas ($b_1$ y $b_2$) actualizadas según nuestros datos. Calcular la predicción utilizando los posibles valores de nuestras incógnitas facilita mostrar la incertidumbre de las predicciones.
 
 ```{r}
 y_hat_sim <- sim(mod2, 
@@ -180,7 +180,7 @@ mean(y_hat_sim)
 quantile(y_hat_sim, probs = c(0.05, 0.5, 0.95))
 ```
 
-Ahora no solo tenemos una estimación puntual del posible valor de nuestra predicción, sino toda una distribución de posibles valores. Esto da la posibilidad de mostrar con certeza (dado el modelo) los rangos de valores dentro de los cuales estarían los valores más probables de nuestra predicción.
+Ahora no solo tenemos una estimación puntual del posible valor de nuestra predicción, sino toda una distribución de posibles valores. Esto da la posibilidad de mostrar con certeza rangos de valores dentro de los cuales estarían los valores más probables de nuestra predicción.
 
 Utilizar valores simulados de nuestra distribución posterior también nos permite evaluar la probabilidad de tener valores mayores o menores de cierto umbral.
 
@@ -196,7 +196,7 @@ O que esté entre 10 y 20:
 sum(y_hat_sim > 10 & y_hat_sim < 20) / length(y_hat_sim)
 ```
 
-El código en Stan:
+El código de Stan que genera la librería Rethinking se puede ver con la función *stancode*:
 
 ```{r}
 stancode(mod2)
@@ -206,11 +206,11 @@ stancode(mod2)
 
 Una pequeña explicación práctica de qué es la máxima verosimilitud (**maximum likelihood**):
 
-Para esto nos planteamos la siguiente pregunta: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos?
+Para esto nos planteamos la pregunta: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos?
 
 ¿Cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$? En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
 
-En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal:
+En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal. (Recordemos que $t$ es un valor generado de una distribución normal de promedio 7 y desviación estándard 1.5).
 
 ```{r}
 t
@@ -269,6 +269,8 @@ plot(x_norm, y_norm)
 
 dnorm(9, mean = 7, sd = 1.5)
 ```
+
+------
 
 Algo más sobre el muestreo del HMC detrás de STAN: los trace plots
 
