@@ -1,7 +1,7 @@
 ---
 title: "Introducción a la inferencia bayesiana"
 author: "Guillermo A. Durán"
-date: "27 de setiembre de 2021"
+date: "28 de setiembre de 2021"
 output:
   html_document:
     df_print: paged
@@ -11,7 +11,15 @@ output:
 library(rethinking)
 ```
 
-# El modelo generador de datos:
+Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Se hará énfasis en dos temas principales: las diferentes interpretaciones de probabilidad y el modelo generador de datos.
+
+## Interpretaciones de probabilidad:
+
+-   Según el enfoque frecuentista: el límite de la proporción de un evento en una serie larga de observaciones/experimentos.
+
+-   Según el enfoque bayesiano: cuantificación de nuestra incertidumbre sobre un fenómeno.
+
+## El modelo generador de datos:
 
 Usamos la distribución normal como ejemplo de cómo originar un valor desde un modelo generador de datos.
 
@@ -28,7 +36,7 @@ El modelo generador de datos también nos permite tomar el camino opuesto: Dado 
 dnorm(t, mean = 7, sd = 1.5)
 ```
 
-## Generando nuestros datos: siendo los dueños de nuestro universo
+### Generando nuestros datos: siendo los dueños de nuestro universo
 
 Ahora en vez de crear un único valor, vamos a crear un vector con 400 valores desde nuestro modelo generador de datos.
 
@@ -270,7 +278,7 @@ plot(x_norm, y_norm)
 dnorm(9, mean = 7, sd = 1.5)
 ```
 
-------
+------------------------------------------------------------------------
 
 Algo más sobre el muestreo del HMC detrás de STAN: los trace plots
 
