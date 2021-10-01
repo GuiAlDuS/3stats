@@ -15,9 +15,13 @@ Este notebook es una introducción práctica muy general sobre la inferencia bay
 
 ## Interpretaciones de probabilidad:
 
--   Según el enfoque frecuentista: el límite de la proporción de un evento en una serie larga de observaciones/experimentos.
+-   Según el enfoque frecuentista: probabilidad es el límite de la proporción de un evento en una serie larga de observaciones/experimentos.
 
--   Según el enfoque bayesiano: cuantificación de nuestra incertidumbre sobre un fenómeno.
+    $$
+    \lim_{N\to\infty}\frac{n}{N}=P(S)
+    $$
+
+-   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno.
 
 ## El modelo generador de datos:
 
