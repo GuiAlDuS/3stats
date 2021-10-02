@@ -17,15 +17,11 @@ Este notebook es una introducción práctica muy general sobre la inferencia bay
 
 -   Según el enfoque frecuentista: probabilidad es el límite de la proporción de un evento en una serie larga de observaciones/experimentos.
 
-    $$
-    \lim_{N\to\infty}\frac{n}{N}=P(S)
-    $$
-
 -   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno.
 
 ## El modelo generador de datos:
 
-Usamos la distribución normal como ejemplo de cómo originar un valor desde un modelo generador de datos.
+Usamos la distribución normal como ejemplo de cómo generar un valor desde un modelo generador de datos.
 
 ```{r}
 t <- rnorm(1, mean = 7, sd = 1.5)
@@ -101,7 +97,7 @@ hist(df$w, breaks = 20)
 hist(df$z, breaks = 20)
 ```
 
-Ya que conocemos los valores reales de nuestros coeficientes ($a$ y $b$), podemos saber cuál valor tendría $y$ (la altura de la planta) con una combinación cualquiera de $w$ y $z$ (agua y luz).
+Ya que conocemos los valores reales de nuestros coeficientes ($a$ y $b$), podemos saber facilmente cuál valor tendría $y$ (la altura de la planta) con una combinación cualquiera de $w$ y $z$ (agua y luz).
 
 ```{r}
 w1 = 3
@@ -111,11 +107,11 @@ z1 = 9
 mean(b1*w1 + b2*z1)
 ```
 
+Este sería el valor real de la altura de la planta con 3 unidades de agua y 9 de luz en nuestro universo de datos generados.
+
 ## Inferencia estadística tradicional:
 
-En estadística inferencial, normalmente estimamos los valores de los coeficientes $b_1$ y $b_2$.
-
-Dado que al generar nuestros datos sabemos los verdaderos valores de los coeficientes, podemos evaluar su similitud con las estimaciones hechas con métodos trandicionales de inferencia estadística.
+En estadística inferencial, normalmente estimamos los valores de los coeficientes de las variables ($b_1$ y $b_2$). Ya que nosotros mismos generamos los datos y conocemos los valores reales de estos coeficientes, podremos comparar qué tanto se acercan los valores de las estimaciones a los valores reales.
 
 Usando una regresión lineal:
 
@@ -124,7 +120,7 @@ mod1 <- lm(y ~ w + z, df)
 mod1 |> summary()
 ```
 
-Los coeficientes se acercan a nuestros valores reales, pero nótese cómo para el coeficiente de $z$ ($b_2$), el resumen nos dice que no es "estadísticamente significativo".
+Viendo el resumen de la regresión podemos notar que los coeficientes se acercan a nuestros valores reales.
 
 Luego de estimarse los coeficientes, podemos hacer una predicción:
 
@@ -138,7 +134,7 @@ Vease la cercanía con nuestro valor verdadero.
 
 ## Inferencia bayesiana:
 
-En inferencia bayesiana es necesario plantear un modelo generador de datos y este debe ajustarse al conocimiento que tengamos del proceso que pensemos ha generado los datos observados. En nuestro caso podemos utilizar:
+En inferencia bayesiana es necesario plantear un modelo generador de datos y este debe ajustarse al conocimiento que tengamos del proceso que pensemos ha generado los datos observados. En nuestro caso utilizamos el siguiente:
 
 $$
 y \sim Normal(\mu, \sigma) \\
@@ -283,12 +279,6 @@ dnorm(9, mean = 7, sd = 1.5)
 ```
 
 ------------------------------------------------------------------------
-
-Algo más sobre el muestreo del HMC detrás de STAN: los trace plots
-
-```{r}
-traceplot(mod2)
-```
 
 Y finalmente, todo esto viene del teorema de Bayes:
 
