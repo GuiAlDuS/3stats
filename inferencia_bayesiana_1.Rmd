@@ -9,6 +9,7 @@ output:
 
 ```{r message=FALSE, warning=FALSE}
 library(rethinking)
+set.seed(1234)
 ```
 
 Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro Statistical Rethinking.
