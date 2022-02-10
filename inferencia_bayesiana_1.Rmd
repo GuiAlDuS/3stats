@@ -11,17 +11,19 @@ output:
 library(rethinking)
 ```
 
-Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Se hará énfasis en dos temas principales: las diferentes interpretaciones de probabilidad y el modelo generador de datos.
+Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro Statistical Rethinking.
 
-## Interpretaciones de probabilidad:
+## Interpretaciones (muy generales) de probabilidad:
 
--   Según el enfoque frecuentista: probabilidad es el límite de la proporción de un evento en una serie larga de observaciones/experimentos.
+-   Según el enfoque frecuentista: probabilidad es la proporción de un evento específico en una serie larga de observaciones/experimentos.
 
 -   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno.
 
 ## El modelo generador de datos:
 
-Usamos la distribución normal como ejemplo de cómo generar un valor desde un modelo generador de datos.
+El modelo generador de datos es una función capaz de producir valores.
+
+Usamos la distribución normal como ejemplo de cómo generar un valor desde un modelo generador de datos. En este caso la distribución normal es nuestro modelo generador de datos.
 
 ```{r}
 t <- rnorm(1, mean = 7, sd = 1.5)
@@ -48,9 +50,13 @@ n = 400
 w <- rnorm(n, mean = 7, sd = 1.5)
 
 hist(w, breaks = 20)
-mean(w)
-sd(w)
+cat(
+  paste0("Promedio: ", round(mean(w), 2), 
+         "\nDesviación estándard: ", round(sd(w), 2)))
+
 ```
+
+#### Un ejemplo usando nuestro modelo generador de datos
 
 Ahora pensemos que en nuestro universo la altura de una planta está dada por dos factores (variables) en una relación según la siguiente ecuación:
 
@@ -70,11 +76,13 @@ $z$ = cantidad de luz
 
 $b_2$ = coeficiente que nos indica el aporte de la cantidad de luz en la altura de la planta
 
-Ya que nosotros mismos creamos nuestros datos, podemos calcular los valores "reales" que tendría la variable $y$ (la altura de la planta) en cada una de nuestras combinaciones de valores de agua y luz. Para esto aprovechamos las facilidades que nos brindan las operaciones vectoriales de R.
+Ya que en nuestro universo nosotros conocemos la verdadera relación matemática que genera los datos que observamos, podemos calcular los valores "reales" que tendría la variable $y$ (la altura de la planta) en cada una de nuestras combinaciones de valores de agua y luz. Para esto aprovechamos las facilidades que nos brindan las operaciones vectoriales de R.
 
 ```{r}
+#vector de tamaño n de una distribución uniforme con valores entre 5 y 9
 z <- runif(n, min = 5, max = 9)
 
+#vectores de tamaño n generados por una distribución normal con los siguientes parámetros:
 b1 <- rnorm(n, mean = 5, sd = 0.7)
 b2 <- rnorm(n, mean = 0.3, sd = 0.1)
 
@@ -111,7 +119,7 @@ Este sería el valor real de la altura de la planta con 3 unidades de agua y 9 d
 
 ## Inferencia estadística tradicional:
 
-En estadística inferencial, normalmente estimamos los valores de los coeficientes de las variables ($b_1$ y $b_2$). Ya que nosotros mismos generamos los datos y conocemos los valores reales de estos coeficientes, podremos comparar qué tanto se acercan los valores de las estimaciones a los valores reales.
+En estadística inferencial, normalmente estimamos los valores de los coeficientes de las variables ($b_1$ y $b_2$) y evaluamos qué tan probable es que nuestras estimaciones hayan sido generadas por la variación de las observaciones. Ya que nosotros mismos generamos los datos y conocemos los valores reales de estos coeficientes, podremos comparar qué tanto se acercan los valores de las estimaciones a los valores reales.
 
 Usando una regresión lineal:
 
@@ -120,7 +128,7 @@ mod1 <- lm(y ~ w + z, df)
 mod1 |> summary()
 ```
 
-Viendo el resumen de la regresión podemos notar que los coeficientes se acercan a nuestros valores reales.
+Viendo el resumen de la regresión podemos notar que los coeficientes (\*Estimate\*) se acercan a nuestros valores reales.
 
 Luego de estimarse los coeficientes, podemos hacer una predicción:
 
@@ -214,11 +222,9 @@ stancode(mod2)
 
 Una pequeña explicación práctica de qué es la máxima verosimilitud (**maximum likelihood**):
 
-Para esto nos planteamos la pregunta: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos?
+Para esto nos planteamos las preguntas: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos? y ¿cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$?. En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
 
-¿Cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$? En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
-
-En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal. (Recordemos que $t$ es un valor generado de una distribución normal de promedio 7 y desviación estándard 1.5).
+En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal. (Recordemos que $t$ es un valor generado de una distribución normal de promedio 7 y desviación estándard 1.5 y estamos tratando de *inferir* cuáles son los parámetros de esa distribución *desconocida*).
 
 ```{r}
 t
