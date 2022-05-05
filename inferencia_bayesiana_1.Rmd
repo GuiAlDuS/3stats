@@ -12,13 +12,15 @@ library(rethinking)
 set.seed(1234)
 ```
 
-Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro Statistical Rethinking.
+Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/).
 
 ## Interpretaciones (muy generales) de probabilidad:
 
--   Según el enfoque frecuentista: probabilidad es la proporción de un evento específico en una serie larga de observaciones/experimentos.
+-   Según el enfoque frecuentista: probabilidad es la proporción de un tipo de evento específico en una serie larga de observaciones de un fenómeno. Esta es la probabilidad que tradicionalmente nos han enseñado en los cursos generales de estadística. Es importante considerar que la repetibilidad de observaciones que supone esta definición implica condiciones que en ciertas situaciones resultan imposibles.
 
--   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno.
+-   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno. Vemos que esta es una definición más abierta a fenómenos donde no se pueden repetir observaciones o donde el tipo de evento que se espera aún no se ha dado pero que podemos asumir que no tiene probabilidad 0 y queremos estimarla.
+
+Esta diferencia de interpretaciones tiene consecuencias importantes, no solo a nivel práctico si no inclusive a nivel filosófico.
 
 ## El modelo generador de datos:
 
@@ -31,7 +33,7 @@ t <- rnorm(1, mean = 7, sd = 1.5)
 t
 ```
 
-Nuestro valor *t* es generado por una función con parámetros conocidos (los parámetros en el caso de una distribución normal son el promedio y desviación estándard). Cada vez que creamos un valor desde un modelo generador de datos, este valor fluctuará según las características propias del modelo.
+Nuestro valor *t* es generado por una función con parámetros conocidos (los parámetros en el caso de una distribución normal son el promedio y desviación estándar). Cada vez que creamos un valor desde un modelo generador de datos, este valor fluctuará según las características propias del modelo.
 
 El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él?. A esta estimación se le llama *verosimilitud* y se hablará de ella al final del notebook.
 
@@ -43,7 +45,7 @@ dnorm(t, mean = 7, sd = 1.5)
 
 Ahora en vez de crear un único valor, vamos a crear un vector con 400 valores desde nuestro modelo generador de datos.
 
-Si exploramos ese vector vemos cómo se reflejan las características (parámetros: promedio y desviación estándard) de nuestro modelo generador de datos.
+Si exploramos ese vector vemos cómo se reflejan las características (parámetros: promedio y desviación estándar) de nuestro modelo generador de datos. Esto lo podemos ver tanto con su histograma como con el valor de los estadísticos.
 
 ```{r}
 n = 400
@@ -51,6 +53,7 @@ n = 400
 w <- rnorm(n, mean = 7, sd = 1.5)
 
 hist(w, breaks = 20)
+
 cat(
   paste0("Promedio: ", round(mean(w), 2), 
          "\nDesviación estándard: ", round(sd(w), 2)))
@@ -98,7 +101,13 @@ df <- data.frame(
 head(df)
 ```
 
-Con histogramas podemos ver sus distribuciones:
+Notese que los valores de $b_1$ y $b_2$ (los coeficientes que nos indican el aporte de cada variable) se generaron utilizando un *modelo generador de datos*, en este caso una distribución normal con parámetros establecidos. Por lo anterior, cada valor de $b$ variará según los parámetros del modelo que los generó. **El objetivo de la inferencia estadística será, a través de los datos observados, estimar el valor de los parámetros detrás del modelo (proceso) que los generó**; en el caso de nuestro ejemplo será estimar el promedio (y si se quiere también la desviación estándar) de la distribución normal que me generó los vectores de $b_1$ y $b_2$, o sea, si la inferencia es correcta, estos valores estimados se aproximarán a 5 y 0.3, respectivamente.
+
+También podemos pensar que al hacer inferencia estadística invertimos el proceso de generar los datos: en vez de generar valores usando un modelo generador de datos con parámetros establecidos (siendo los dioses creadores de este universo), lo que haremos es, utilizando los valores generados por algún proceso que queremos entender, estimaremos los parámetros de las distribuciones que pensamos los generaron (somos personas que únicamente observamos los valores); y si utilizamos inferencia bayesiana, no solo estimamos esos valores si no que calculamos la incertidumbre que tenemos de ellos (según la información/evidencia/datos con que contamos).
+
+También es importante hacer notar que el proceso de inferencia bayesiana también implica establecer ciertos supuestos, por ejemplo, cuáles distribuciones consideramos que están detrás de los valores observados. Para esto el libro *Statistical Rethinking* aconseja guiarnos por las distribuciones que nos reduzcan la cantidad de supuestos según el conocimiento que tenemos del proceso que estamos estudiando ([principio de máxima entropía](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy)).
+
+En el caso de nuestro ejemplo, podemos ver las distribuciones de los valores generados utilizando histogramas:
 
 ```{r message=FALSE, warning=FALSE}
 hist(df$y, breaks = 20)
@@ -106,7 +115,7 @@ hist(df$w, breaks = 20)
 hist(df$z, breaks = 20)
 ```
 
-Ya que conocemos los valores reales de nuestros coeficientes ($a$ y $b$), podemos saber facilmente cuál valor tendría $y$ (la altura de la planta) con una combinación cualquiera de $w$ y $z$ (agua y luz).
+Ya que conocemos los valores reales de nuestros coeficientes ($b_1$ y $b_2$), podemos saber fácilmente, en promedio, cuál valor tendría $y$ (la altura de la planta) con una combinación cualquiera de $w$ y $z$ (agua y luz).
 
 ```{r}
 w1 = 3
@@ -116,11 +125,11 @@ z1 = 9
 mean(b1*w1 + b2*z1)
 ```
 
-Este sería el valor real de la altura de la planta con 3 unidades de agua y 9 de luz en nuestro universo de datos generados.
+Este sería la altura promedio de las plantas cuando les aplicamos 3 unidades de agua y 9 de luz en nuestro universo de datos generados.
 
-## Inferencia estadística tradicional:
+## Inferencia estadística tradicional y predicciones:
 
-En estadística inferencial, normalmente estimamos los valores de los coeficientes de las variables ($b_1$ y $b_2$) y evaluamos qué tan probable es que nuestras estimaciones hayan sido generadas por la variación de las observaciones. Ya que nosotros mismos generamos los datos y conocemos los valores reales de estos coeficientes, podremos comparar qué tanto se acercan los valores de las estimaciones a los valores reales.
+Como se mencionó anteriormente, en estadística inferencial normalmente estimamos los valores de los coeficientes de las variables ($b_1$ y $b_2$) y evaluamos qué tan probable es que nuestras estimaciones hayan sido generadas por azar (significancia estadística). Ya que en este ejemplo nosotros mismos generamos los datos y conocemos los valores reales de estos coeficientes, podremos comparar qué tanto se acercan los valores de las estimaciones a los valores reales.
 
 Usando una regresión lineal:
 
@@ -129,7 +138,7 @@ mod1 <- lm(y ~ w + z, df)
 mod1 |> summary()
 ```
 
-Viendo el resumen de la regresión podemos notar que los coeficientes (\*Estimate\*) se acercan a nuestros valores reales.
+Viendo el resumen de la regresión podemos notar que los coeficientes (*Estimate* para $w$ y $z$ ) se acercan en cierto grado a nuestros valores reales y son "estadísticamente significativos" (*Pr* menores a 0.05). Existe una discusión muy larga sobre significancia estadística en métodos frecuentistas que evitaré.
 
 Luego de estimarse los coeficientes, podemos hacer una predicción:
 
@@ -139,7 +148,7 @@ predict(mod1,
 
 ```
 
-Vease la cercanía con nuestro valor verdadero.
+Véase la cercanía con nuestro valor promedio real (17.64).
 
 ## Inferencia bayesiana:
 
@@ -157,7 +166,7 @@ El modelo se lee: $y$ proviene de una distribución normal donde su promedio est
 
 Notese que a nuestras incógnitas ($\sigma$, $b_1$ y $b_2$ ) les asignamos distribuciones de "posibles valores" (a estas distribuciones también se le llaman "previas"). Durante el ajuste del modelo, él se encargará de encontrar las distribuciones más adecuadas según nuestros datos.
 
-El modelo ahora debe ser codificado y en este caso usamos la sintaxis de la librería Rethinking. Esta librería "traduce" el código desde R al lenguaje del programa Stan y lo ejecuta.
+El modelo ahora debe ser codificado y en este caso usamos la sintaxis de la librería [Rethinking](https://github.com/rmcelreath/rethinking). Esta librería "traduce" el código desde R al lenguaje del programa Stan y lo ejecuta.
 
 ```{r message=FALSE, warning=FALSE}
 mod2 <- ulam(
@@ -171,7 +180,7 @@ mod2 <- ulam(
 )
 ```
 
-Luego de que el modelo ha terminado de ajustarse, podemos ver los valores de nuestras incógnitas (distribución posterior) tanto puntualmente como a manera de distribuciones:
+Luego de que el modelo ha terminado de ajustarse, podemos ver los valores de nuestras incógnitas (distribución posterior) tanto como estadísticos como también distribuciones:
 
 ```{r}
 precis(mod2)
@@ -182,11 +191,13 @@ hist(smpls$b1)
 
 ```
 
-Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en el modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas (cualquier valor posible entre dos límites), al calcular la posterior el modelo logró muy bien actualizarlas a valores posibles muy cercanos a la realidad. Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia presentada (datos).
+Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en el modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas ( distribuciones uniformes donde cualquier valor entre dos límites tiene la misma probabilidad), al calcular la posterior el modelo logró muy bien aproximar las estimaciones a valores posibles muy cercanos a la realidad. **Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia observada (datos).**
+
+También es muy importante recalcar que con estas distribuciones podemos calcular rangos de certeza (intervalos de credibilidad), entre los cuales la evidencia nos indica con cierta probabilidad dónde puede estar el valor del parámetro (salidas de la función *precis()*).
 
 ### Ahora la predicción:
 
-Ya que en el modelo bayesiano todas nuestras incógnitas son distribuciones, al calcular una predicción el modelo usa muestras de los posibles valores de las incógnitas ($b_1$ y $b_2$) actualizadas según nuestros datos. Calcular la predicción utilizando los posibles valores de nuestras incógnitas facilita mostrar la incertidumbre de las predicciones.
+Ya que en el modelo bayesiano todas nuestras incógnitas y estimaciones son distribuciones, al calcular una predicción el modelo usa muestras de las distribuciones estimadas ($b_1$ y $b_2$) . Calcular la predicción utilizando los posibles valores de nuestras incógnitas facilita mostrar la incertidumbre de las predicciones.
 
 ```{r}
 y_hat_sim <- sim(mod2, 
@@ -221,11 +232,11 @@ stancode(mod2)
 
 ------------------------------------------------------------------------
 
-Una pequeña explicación práctica de qué es la máxima verosimilitud (**maximum likelihood**):
+Ahora una pequeña explicación práctica de qué es la máxima verosimilitud (**maximum likelihood**):
 
-Para esto nos planteamos las preguntas: ¿Cuanto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos? y ¿cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$?. En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
+Para esto nos planteamos las preguntas: ¿Cuánto varía la verosimilitud para un valor $t$ si cambiamos los valores de los parámetros de nuestro modelo generador de datos? y ¿cuál de estos nuevos valores de los parámetros me da la verosimilitud mayor para $t$?. En otras palabras, ¿cuál valor de los parámetros de nuestro modelo generador de datos sería el que con mayor certeza me generó este dato específico?
 
-En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal. (Recordemos que $t$ es un valor generado de una distribución normal de promedio 7 y desviación estándard 1.5 y estamos tratando de *inferir* cuáles son los parámetros de esa distribución *desconocida*).
+En el ejemplo lo hacemos cambiando el valor del promedio de una distribución normal. (Recordemos que $t$ es un valor generado de una distribución normal de promedio 7 y desviación estándar 1.5, y estamos tratando de *inferir* cuáles son los parámetros de esa distribución *desconocida*).
 
 ```{r}
 t
@@ -284,11 +295,3 @@ plot(x_norm, y_norm)
 
 dnorm(9, mean = 7, sd = 1.5)
 ```
-
-------------------------------------------------------------------------
-
-Y finalmente, todo esto viene del teorema de Bayes:
-
-$$
-p(h|d) = \frac{p(d|h) p(h)}{p(d)}
-$$
