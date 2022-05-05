@@ -1659,9 +1659,10 @@ condiciones que en ciertas situaciones resultan imposibles.</p></li>
 <li><p>Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1
 que cuantifica nuestra incertidumbre sobre un fenómeno. Vemos que esta
 es una definición más abierta a fenómenos donde no se pueden repetir
-observaciones o donde el tipo de evento que se espera aún no se ha dado
-pero que podemos asumir que no tiene probabilidad 0 y queremos
-estimarla.</p></li>
+observaciones o donde el tipo de evento a observar aún no ha ocurrido
+pero que podemos asumir que tiene una probabilidad distinta a 0 y
+queremos estimarla (probabilidad de la explosión de una bomba nuclear
+mientras es transportada, por ejemplo).</p></li>
 </ul>
 <p>Esta diferencia de interpretaciones tiene consecuencias importantes,
 no solo a nivel práctico si no inclusive a nivel filosófico.</p>
@@ -1904,44 +1905,44 @@ ejecuta.</p>
 ## Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 3 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
-## Chain 3 Iteration: 500 / 1000 [ 50%]  (Warmup) 
-## Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 4 Iteration: 300 / 1000 [ 30%]  (Warmup) 
-## Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 1 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 1 Iteration: 600 / 1000 [ 60%]  (Sampling) 
 ## Chain 2 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
+## Chain 3 Iteration: 500 / 1000 [ 50%]  (Warmup) 
+## Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 3 Iteration: 600 / 1000 [ 60%]  (Sampling) 
 ## Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
+## Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 4 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 1 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 2 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-## Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 3 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 4 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-## Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 2 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 4 Iteration: 800 / 1000 [ 80%]  (Sampling) 
-## Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 1 finished in 0.7 seconds.
 ## Chain 3 finished in 0.6 seconds.
 ## Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-## Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
-## Chain 2 finished in 0.8 seconds.
 ## Chain 4 finished in 0.7 seconds.
+## Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 2 finished in 0.8 seconds.
 ## 
 ## All 4 chains finished successfully.
 ## Mean chain execution time: 0.7 seconds.
-## Total execution time: 0.9 seconds.</code></pre>
+## Total execution time: 1.0 seconds.</code></pre>
 <p>Luego de que el modelo ha terminado de ajustarse, podemos ver los
 valores de nuestras incógnitas (distribución posterior) tanto como
 estadísticos como también distribuciones:</p>

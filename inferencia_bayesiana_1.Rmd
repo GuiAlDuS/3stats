@@ -18,7 +18,7 @@ Este notebook es una introducción práctica muy general sobre la inferencia bay
 
 -   Según el enfoque frecuentista: probabilidad es la proporción de un tipo de evento específico en una serie larga de observaciones de un fenómeno. Esta es la probabilidad que tradicionalmente nos han enseñado en los cursos generales de estadística. Es importante considerar que la repetibilidad de observaciones que supone esta definición implica condiciones que en ciertas situaciones resultan imposibles.
 
--   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno. Vemos que esta es una definición más abierta a fenómenos donde no se pueden repetir observaciones o donde el tipo de evento que se espera aún no se ha dado pero que podemos asumir que no tiene probabilidad 0 y queremos estimarla.
+-   Según el enfoque bayesiano: probabilidad es un valor entre 0 y 1 que cuantifica nuestra incertidumbre sobre un fenómeno. Vemos que esta es una definición más abierta a fenómenos donde no se pueden repetir observaciones o donde el tipo de evento a observar aún no ha ocurrido pero que podemos asumir que tiene una probabilidad distinta a 0 y queremos estimarla (probabilidad de la explosión de una bomba nuclear mientras es transportada, por ejemplo).
 
 Esta diferencia de interpretaciones tiene consecuencias importantes, no solo a nivel práctico si no inclusive a nivel filosófico.
 
