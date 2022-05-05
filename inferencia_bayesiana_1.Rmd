@@ -101,11 +101,9 @@ df <- data.frame(
 head(df)
 ```
 
-Notese que los valores de $b_1$ y $b_2$ (los coeficientes que nos indican el aporte de cada variable) se generaron utilizando un *modelo generador de datos*, en este caso una distribución normal con parámetros establecidos. Por lo anterior, cada valor de $b$ variará según los parámetros del modelo que los generó. **El objetivo de la inferencia estadística será, a través de los datos observados, estimar el valor de los parámetros detrás del modelo (proceso) que los generó**; en el caso de nuestro ejemplo será estimar el promedio (y si se quiere también la desviación estándar) de la distribución normal que me generó los vectores de $b_1$ y $b_2$, o sea, si la inferencia es correcta, estos valores estimados se aproximarán a 5 y 0.3, respectivamente.
+Notese que los valores de $b_1$ y $b_2$ (los coeficientes que nos indican el aporte de cada variable) se generaron utilizando un *modelo generador de datos*, en este caso una distribución normal con parámetros establecidos. Por lo anterior, cada valor de $b$ variará según los parámetros del modelo que los generó. **El objetivo de la inferencia estadística será, a través de los datos observados, estimar el valor de los parámetros detrás del modelo (proceso) que los generó**. En el caso de nuestro ejemplo será estimar el promedio (y si se quiere también la desviación estándar) de la distribución normal que me generó los vectores de $b_1$ y $b_2$, o sea, si la inferencia es correcta, estos valores estimados se aproximarán a 5 y 0.3 respectivamente.
 
-También podemos pensar que al hacer inferencia estadística invertimos el proceso de generar los datos: en vez de generar valores usando un modelo generador de datos con parámetros establecidos (siendo los dioses creadores de este universo), lo que haremos es, utilizando los valores generados por algún proceso que queremos entender, estimaremos los parámetros de las distribuciones que pensamos los generaron (somos personas que únicamente observamos los valores); y si utilizamos inferencia bayesiana, no solo estimamos esos valores si no que calculamos la incertidumbre que tenemos de ellos (según la información/evidencia/datos con que contamos).
-
-También es importante hacer notar que el proceso de inferencia bayesiana también implica establecer ciertos supuestos, por ejemplo, cuáles distribuciones consideramos que están detrás de los valores observados. Para esto el libro *Statistical Rethinking* aconseja guiarnos por las distribuciones que nos reduzcan la cantidad de supuestos según el conocimiento que tenemos del proceso que estamos estudiando ([principio de máxima entropía](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy)).
+También podemos pensar que al hacer inferencia estadística invertimos el proceso de generar los datos: en vez de generar valores usando un modelo generador de datos con parámetros establecidos (siendo los dioses creadores de este universo), lo que haremos es, utilizando los valores generados por algún proceso que queremos entender, estimaremos los parámetros de las distribuciones que pensamos los generaron (somos personas que únicamente observamos los valores); y si utilizamos inferencia bayesiana, no solo estimamos esos valores si no que calculamos su incertidumbre (según la información/evidencia/datos con que contamos).
 
 En el caso de nuestro ejemplo, podemos ver las distribuciones de los valores generados utilizando histogramas:
 
@@ -162,7 +160,9 @@ b_2 \sim Uniform(0,15) \\
 \sigma \sim Exp(1)
 $$
 
-El modelo se lee: $y$ proviene de una distribución normal donde su promedio está en función de una regresión lineal de $w$ y $z$.
+El modelo se lee: $y$ proviene de una distribución normal donde su promedio está en función de una regresión lineal de las variables $w$ y $z$. Los coeficientes $b_1$ y $b_2$ provienen de distribuciones uniformes con valores entre 0 y 15, mientras que $\sigma$ de una distribución exponencial con parámetro igual a 1 (solo genera valores positivos).
+
+A la primera línea del modelo también se le llama *verosimilitud* (*likelihood*) y crearla plantea la dificultad de escoger la distribución que pensamos genera nuestros datos. Para esto el libro *Statistical Rethinking* aconseja guiarnos por las distribuciones que nos reduzcan la cantidad de supuestos según el conocimiento que tenemos del proceso que estamos estudiando ([principio de máxima entropía](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy)). En el caso de fenómenos donde lo único que conocemos es que los valores que producen tienen una varianza finita, la distribución normal es la que nos plantea menos supuestos.
 
 Notese que a nuestras incógnitas ($\sigma$, $b_1$ y $b_2$ ) les asignamos distribuciones de "posibles valores" (a estas distribuciones también se le llaman "previas"). Durante el ajuste del modelo, él se encargará de encontrar las distribuciones más adecuadas según nuestros datos.
 
@@ -193,7 +193,7 @@ hist(smpls$b1)
 
 Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en el modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas ( distribuciones uniformes donde cualquier valor entre dos límites tiene la misma probabilidad), al calcular la posterior el modelo logró muy bien aproximar las estimaciones a valores posibles muy cercanos a la realidad. **Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia observada (datos).**
 
-También es muy importante recalcar que con estas distribuciones podemos calcular rangos de certeza (intervalos de credibilidad), entre los cuales la evidencia nos indica con cierta probabilidad dónde puede estar el valor del parámetro (salidas de la función *precis()*).
+También es muy importante recalcar que con estas distribuciones podemos calcular rangos de certeza (intervalos de credibilidad). Entre estos valores la evidencia nos indica con cierta probabilidad dónde puede estar el valor del parámetro (salidas de la función *precis()*).
 
 ### Ahora la predicción:
 

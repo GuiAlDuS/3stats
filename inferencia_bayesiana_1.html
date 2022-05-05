@@ -1756,11 +1756,11 @@ indican el aporte de cada variable) se generaron utilizando un
 con parámetros establecidos. Por lo anterior, cada valor de <span class="math inline">\(b\)</span> variará según los parámetros del modelo
 que los generó. <strong>El objetivo de la inferencia estadística será, a
 través de los datos observados, estimar el valor de los parámetros
-detrás del modelo (proceso) que los generó</strong>; en el caso de
+detrás del modelo (proceso) que los generó</strong>. En el caso de
 nuestro ejemplo será estimar el promedio (y si se quiere también la
 desviación estándar) de la distribución normal que me generó los
 vectores de <span class="math inline">\(b_1\)</span> y <span class="math inline">\(b_2\)</span>, o sea, si la inferencia es correcta,
-estos valores estimados se aproximarán a 5 y 0.3, respectivamente.</p>
+estos valores estimados se aproximarán a 5 y 0.3 respectivamente.</p>
 <p>También podemos pensar que al hacer inferencia estadística invertimos
 el proceso de generar los datos: en vez de generar valores usando un
 modelo generador de datos con parámetros establecidos (siendo los dioses
@@ -1769,16 +1769,8 @@ generados por algún proceso que queremos entender, estimaremos los
 parámetros de las distribuciones que pensamos los generaron (somos
 personas que únicamente observamos los valores); y si utilizamos
 inferencia bayesiana, no solo estimamos esos valores si no que
-calculamos la incertidumbre que tenemos de ellos (según la
-información/evidencia/datos con que contamos).</p>
-<p>También es importante hacer notar que el proceso de inferencia
-bayesiana también implica establecer ciertos supuestos, por ejemplo,
-cuáles distribuciones consideramos que están detrás de los valores
-observados. Para esto el libro <em>Statistical Rethinking</em> aconseja
-guiarnos por las distribuciones que nos reduzcan la cantidad de
-supuestos según el conocimiento que tenemos del proceso que estamos
-estudiando (<a href="https://en.wikipedia.org/wiki/Principle_of_maximum_entropy">principio
-de máxima entropía</a>).</p>
+calculamos su incertidumbre (según la información/evidencia/datos con
+que contamos).</p>
 <p>En el caso de nuestro ejemplo, podemos ver las distribuciones de los
 valores generados utilizando histogramas:</p>
 <pre class="r"><code>hist(df$y, breaks = 20)</code></pre>
@@ -1861,7 +1853,20 @@ b_2 \sim Uniform(0,15) \\
 \]</span></p>
 <p>El modelo se lee: <span class="math inline">\(y\)</span> proviene de
 una distribución normal donde su promedio está en función de una
-regresión lineal de <span class="math inline">\(w\)</span> y <span class="math inline">\(z\)</span>.</p>
+regresión lineal de las variables <span class="math inline">\(w\)</span>
+y <span class="math inline">\(z\)</span>. Los coeficientes <span class="math inline">\(b_1\)</span> y <span class="math inline">\(b_2\)</span> provienen de distribuciones uniformes
+con valores entre 0 y 15, mientras que <span class="math inline">\(\sigma\)</span> de una distribución exponencial
+con parámetro igual a 1 (solo genera valores positivos).</p>
+<p>A la primera línea del modelo también se le llama
+<em>verosimilitud</em> (<em>likelihood</em>) y crearla plantea la
+dificultad de escoger la distribución que pensamos genera nuestros
+datos. Para esto el libro <em>Statistical Rethinking</em> aconseja
+guiarnos por las distribuciones que nos reduzcan la cantidad de
+supuestos según el conocimiento que tenemos del proceso que estamos
+estudiando (<a href="https://en.wikipedia.org/wiki/Principle_of_maximum_entropy">principio
+de máxima entropía</a>). En el caso de fenómenos donde lo único que
+conocemos es que los valores que producen tienen una varianza finita, la
+distribución normal es la que nos plantea menos supuestos.</p>
 <p>Notese que a nuestras incógnitas (<span class="math inline">\(\sigma\)</span>, <span class="math inline">\(b_1\)</span> y <span class="math inline">\(b_2\)</span> ) les asignamos distribuciones de
 “posibles valores” (a estas distribuciones también se le llaman
 “previas”). Durante el ajuste del modelo, él se encargará de encontrar
@@ -1925,12 +1930,12 @@ ejecuta.</p>
 ## Chain 2 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 4 Iteration: 800 / 1000 [ 80%]  (Sampling) 
+## Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 1 finished in 0.7 seconds.
 ## Chain 3 finished in 0.6 seconds.
 ## Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-## Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-## Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 2 finished in 0.8 seconds.
 ## Chain 4 finished in 0.7 seconds.
 ## 
@@ -1962,9 +1967,9 @@ realidad. <strong>Esta es la “actualización bayesiana”, de cómo nuestro
 conocimiento previo (distribuciones previas) se actualiza según la
 evidencia observada (datos).</strong></p>
 <p>También es muy importante recalcar que con estas distribuciones
-podemos calcular rangos de certeza (intervalos de credibilidad), entre
-los cuales la evidencia nos indica con cierta probabilidad dónde puede
-estar el valor del parámetro (salidas de la función
+podemos calcular rangos de certeza (intervalos de credibilidad). Entre
+estos valores la evidencia nos indica con cierta probabilidad dónde
+puede estar el valor del parámetro (salidas de la función
 <em>precis()</em>).</p>
 <div id="ahora-la-predicción" class="section level3">
 <h3>Ahora la predicción:</h3>
