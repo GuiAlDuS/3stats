@@ -12,7 +12,9 @@ library(rethinking)
 set.seed(1234)
 ```
 
-Este notebook es una introducción práctica muy general sobre la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/).
+Este notebook es una introducción práctica muy general a la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/).
+
+El notebook hace énfasis en simulaciones usando modelos generadorres de datos. Estas simulaciones nos permiten conocer de antemano el proceso que generan nuestros datos/observaciones y luego reproduce el procedimiento del analista, donde a través de inferencia estadística trata de reconstruir el proceso que geraron las observaciones. Al haber creado nosotros mismos los datos, estos ejemplos dan la posibilidad de comparar la inferencia hecha vs los valores reales usados para generar los datos. Además, en el notebook también se comparan las predicciones hechas en cada uno de los enfoques y las ventajas que nos brinda el enfoque bayesiano cuando queremos tomar en cuenta la incertidumbre de las predicciones.
 
 ## Interpretaciones (muy generales) de probabilidad:
 
@@ -35,7 +37,7 @@ t
 
 Nuestro valor *t* es generado por una función con parámetros conocidos (los parámetros en el caso de una distribución normal son el promedio y desviación estándar). Cada vez que creamos un valor desde un modelo generador de datos, este valor fluctuará según las características propias del modelo.
 
-El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él?. A esta estimación se le llama *verosimilitud* y se hablará de ella al final del notebook.
+El modelo generador de datos también nos permite tomar el camino opuesto: Dado un modelo generador de datos con parámetros establecidos, ¿qué tan probable es que un valor específico sea generado por él?. A esta estimación se le llama *verosimilitud* y se hablará de ella más adelante.
 
 ```{r}
 dnorm(t, mean = 7, sd = 1.5)
@@ -162,7 +164,7 @@ $$
 
 El modelo se lee: $y$ proviene de una distribución normal donde su promedio está en función de una regresión lineal de las variables $w$ y $z$. Los coeficientes $b_1$ y $b_2$ provienen de distribuciones uniformes con valores entre 0 y 15, mientras que $\sigma$ de una distribución exponencial con parámetro igual a 1 (solo genera valores positivos).
 
-A la primera línea del modelo también se le llama *verosimilitud* (*likelihood*) y crearla plantea la dificultad de escoger la distribución que pensamos genera nuestros datos. Para esto varios autores aconsejan guiarnos por las distribuciones que nos reduzcan la cantidad de supuestos según el conocimiento que tenemos del proceso que estamos estudiando ([principio de máxima entropía](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy)). En el caso de fenómenos donde lo único que conocemos es que los valores que producen tienen una varianza finita, la distribución normal es la que nos plantea menos supuestos.
+A la primera línea del modelo también se le llama *verosimilitud* (*likelihood*) y crearla plantea la dificultad de escoger la distribución que pensamos genera nuestros datos. Para esto varios autores aconsejan guiarnos por las distribuciones que nos reduzcan la cantidad de supuestos según el conocimiento que tenemos del proceso que estamos estudiando ([principio de máxima entropía](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy)). En el caso de fenómenos donde lo único que conocemos es que los valores que se producen tienen una varianza finita, la distribución normal es la que nos plantea menos supuestos.
 
 Notese que a nuestras incógnitas ($\sigma$, $b_1$ y $b_2$ ) les asignamos distribuciones de "posibles valores" (a estas distribuciones también se le llaman "previas"). Durante el ajuste del modelo, él se encargará de encontrar las distribuciones más adecuadas según nuestros datos.
 
@@ -285,7 +287,6 @@ df[which.max(df$mean_likelihood),]
 ```
 
 Vemos que cuando tomamos en cuenta un serie de valores producidos por nuestro modelo generador de datos, la máxima verosimilitud para el parámetro que evaluamos refleja el valor real con el que se generaron los datos. En este caso vemos que de los 15 valores con que evaluamos el parámetro del promedio de nuestro modelo generador de datos (usando el vector de 400 elementos), el 7 resultó ser el que tiene la mayor verosimilitud para el promedio de la distribución normal.
-
 
 ```{=html}
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Licencia de Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />Este obra está bajo una <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">licencia de Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional</a>.
