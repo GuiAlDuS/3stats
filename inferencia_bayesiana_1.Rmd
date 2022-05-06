@@ -12,9 +12,9 @@ library(rethinking)
 set.seed(1234)
 ```
 
-Este notebook es una introducción práctica muy general a la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/).
+Este notebook es una introducción práctica muy general a la inferencia bayesiana. Presenta la forma en que me habría gustado recibir una introducción a la inferencia bayesiana y hace eco al enfoque pedagógico del libro [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/). El notebook está escrito en R y usa la librería [Rethinking](https://github.com/rmcelreath/rethinking) para hacer inferencia bayesiana.
 
-El notebook hace énfasis en simulaciones usando modelos generadorres de datos. Estas simulaciones nos permiten conocer de antemano el proceso que generan nuestros datos/observaciones y luego reproduce el procedimiento del analista, donde a través de inferencia estadística trata de reconstruir el proceso que geraron las observaciones. Al haber creado nosotros mismos los datos, estos ejemplos dan la posibilidad de comparar la inferencia hecha vs los valores reales usados para generar los datos. Además, en el notebook también se comparan las predicciones hechas en cada uno de los enfoques y las ventajas que nos brinda el enfoque bayesiano cuando queremos tomar en cuenta la incertidumbre de las predicciones.
+El notebook hace énfasis en simulaciones usando modelos generadores de datos. Estas simulaciones nos permiten conocer de antemano el proceso que genera nuestros datos/observaciones. Seguidamente se reproduce el procedimiento del analista, donde a través de inferencia estadística trata de reconstruir el proceso que generó las observaciones. Al haber creado nosotros mismos los datos, estos ejemplos dan la posibilidad de comparar la inferencia hecha vs los valores reales usados para generar los datos. Además, en el notebook también se comparan las predicciones hechas en cada uno de los enfoques y las ventajas que nos brinda el enfoque bayesiano cuando queremos tomar en cuenta la incertidumbre de las predicciones.
 
 ## Interpretaciones (muy generales) de probabilidad:
 
@@ -193,9 +193,9 @@ hist(smpls$b1)
 
 ```
 
-Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en el modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas ( distribuciones uniformes donde cualquier valor entre dos límites tiene la misma probabilidad), al calcular la posterior el modelo logró muy bien aproximar las estimaciones a valores posibles muy cercanos a la realidad. **Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia observada (datos).**
+Algo característico de la inferencia bayesiana es que nuestras estimaciones no son puntuales, si no distribuciones de posibles valores según lo establecido en nuestro modelo generador de datos. También es importante notar cómo a pesar de haber usado previas no informativas (distribuciones uniformes donde cualquier valor entre dos límites tiene la misma probabilidad), al calcular la posterior el modelo logró muy bien aproximar las estimaciones a valores posibles muy cercanos a la realidad. **Esta es la "actualización bayesiana", de cómo nuestro conocimiento previo (distribuciones previas) se actualiza según la evidencia observada (datos).**
 
-También es muy importante recalcar que con estas distribuciones podemos calcular rangos de certeza (intervalos de credibilidad). Entre estos valores la evidencia nos indica con cierta probabilidad dónde puede estar el valor del parámetro (salidas de la función *precis()*).
+Además, es muy importante recalcar que con estas distribuciones podemos calcular rangos de certeza (intervalos de credibilidad). Entre estos valores la evidencia nos indica con cierta probabilidad dónde puede estar el valor del parámetro (salidas de la función *precis()*). En nuestro ejemplo, vemos cómo los rangos con un 89% de credibilidad de los coeficientes estimados (el rango que está entre los percentiles 4.5% y 94.5% de la distribución posterior) cubren los valores reales (5 para $b_1$ y 0.3 para $b_2$), inclusive están muy cerca de los promedios de las distribuciones posteriores.
 
 ### Ahora la predicción:
 
