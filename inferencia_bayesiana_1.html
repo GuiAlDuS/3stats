@@ -1646,8 +1646,8 @@ set.seed(1234)</code></pre>
 inferencia bayesiana. Presenta la forma en que me habría gustado recibir
 una introducción a la inferencia bayesiana y hace eco al enfoque
 pedagógico del libro <a href="https://xcelab.net/rm/statistical-rethinking/">Statistical
-Rethinking</a>. El notebook está escrito en R y usa la librería <a href="https://github.com/rmcelreath/rethinking">Rethinking</a> para
-hacer inferencia bayesiana.</p>
+Rethinking</a>. El notebook está escrito en R y usa la librería <a href="https://github.com/rmcelreath/rethinking">Rethinking</a> como
+enlace entre los programas R y Stan.</p>
 <p>Usando un ejemplo sencillo, el notebook hace énfasis en simulaciones
 producto de modelos generadores de datos. Las simulaciones nos permiten
 conocer de antemano el proceso que generan nuestros datos/observaciones.
@@ -1908,7 +1908,6 @@ ejecuta.</p>
 ## Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
 ## Chain 2 Iteration: 100 / 1000 [ 10%]  (Warmup) 
 ## Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-## Chain 2 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
 ## Chain 3 Iteration: 100 / 1000 [ 10%]  (Warmup) 
 ## Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
@@ -1916,12 +1915,12 @@ ejecuta.</p>
 ## Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
 ## Chain 4 Iteration: 100 / 1000 [ 10%]  (Warmup) 
 ## Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-## Chain 4 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 1 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 1 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 1 Iteration: 600 / 1000 [ 60%]  (Sampling) 
+## Chain 2 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 2 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
@@ -1929,11 +1928,13 @@ ejecuta.</p>
 ## Chain 3 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 3 Iteration: 600 / 1000 [ 60%]  (Sampling) 
+## Chain 4 Iteration: 300 / 1000 [ 30%]  (Warmup) 
 ## Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
 ## Chain 4 Iteration: 500 / 1000 [ 50%]  (Warmup) 
 ## Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
 ## Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 1 Iteration: 800 / 1000 [ 80%]  (Sampling) 
+## Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 2 Iteration: 600 / 1000 [ 60%]  (Sampling) 
 ## Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
 ## Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
@@ -1941,19 +1942,18 @@ ejecuta.</p>
 ## Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 4 Iteration: 600 / 1000 [ 60%]  (Sampling) 
 ## Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
-## Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 2 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
 ## Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 4 Iteration: 800 / 1000 [ 80%]  (Sampling) 
 ## Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-## Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 1 finished in 0.5 seconds.
 ## Chain 3 finished in 0.4 seconds.
-## Chain 4 finished in 0.5 seconds.
 ## Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
+## Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
 ## Chain 2 finished in 0.6 seconds.
+## Chain 4 finished in 0.5 seconds.
 ## 
 ## All 4 chains finished successfully.
 ## Mean chain execution time: 0.5 seconds.
